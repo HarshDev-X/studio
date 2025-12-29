@@ -18,7 +18,7 @@ export default function SignupPage() {
             <CardHeader className="text-center">
                 <div className="flex justify-center items-center gap-2 mb-4">
                     <Logo />
-                    <h1 className="text-2xl font-headline font-bold text-primary">SaaSApp</h1>
+                    <h1 className="text-2xl font-headline font-bold text-primary">VERMA & CO.</h1>
                 </div>
                 <CardTitle className="text-2xl font-headline">Sign Up</CardTitle>
                 <CardDescription>

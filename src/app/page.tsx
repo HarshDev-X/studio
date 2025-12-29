@@ -41,7 +41,7 @@ export default function Home() {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-2">
             <Logo />
-            <h1 className="text-2xl font-headline font-bold text-primary">SaaSApp</h1>
+            <h1 className="text-2xl font-headline font-bold text-primary">VERMA & CO.</h1>
           </div>
           <nav className="space-x-2">
             <Button variant="ghost" asChild>
@@ -119,7 +119,7 @@ export default function Home() {
 
       <footer className="py-8 bg-secondary/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} SaaSApp. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} VERMA & CO. All rights reserved.</p>
         </div>
       </footer>
     </div>

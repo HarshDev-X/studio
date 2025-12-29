@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'SaaSApp',
+  title: 'VERMA & CO.',
   description: 'A modern SaaS application',
 };
 
