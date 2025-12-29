@@ -24,18 +24,22 @@ const COLORS = [
 export default function OverviewCharts({ transactions }: OverviewChartsProps) {
     const expenses = transactions.filter(t => t.type === 'expense');
 
-    const monthlyExpenses = useMemo(() => {
-        const data: { [key: string]: number } = {};
-        expenses.forEach(t => {
+    const monthlyOverview = useMemo(() => {
+        const data: { [key: string]: { income: number; expense: number } } = {};
+        transactions.forEach(t => {
             const month = new Date(t.date).toLocaleString('default', { month: 'short', year: '2-digit' });
             if (!data[month]) {
-                data[month] = 0;
+                data[month] = { income: 0, expense: 0 };
             }
-            data[month] += t.amount;
+            if (t.type === 'income') {
+                data[month].income += t.amount;
+            } else {
+                data[month].expense += t.amount;
+            }
         });
 
-        return Object.entries(data).map(([name, total]) => ({ name, total })).reverse();
-    }, [expenses]);
+        return Object.entries(data).map(([name, values]) => ({ name, ...values })).reverse();
+    }, [transactions]);
     
     const categoryExpenses = useMemo(() => {
         const data: { [key: string]: number } = {};
@@ -55,19 +59,21 @@ export default function OverviewCharts({ transactions }: OverviewChartsProps) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
             <CardHeader>
-                <CardTitle className="font-headline">Monthly Expenses</CardTitle>
-                <CardDescription>A bar chart showing your expenses over the last few months.</CardDescription>
+                <CardTitle className="font-headline">Monthly Overview</CardTitle>
+                <CardDescription>A bar chart showing your income and expenses over the last few months.</CardDescription>
             </CardHeader>
             <CardContent className="pl-2">
                 <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={monthlyExpenses}>
+                    <BarChart data={monthlyOverview}>
                         <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                         <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
                         <Tooltip
                             cursor={{fill: 'hsla(var(--muted))'}}
                             contentStyle={{backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))'}}
                          />
-                        <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                        <Legend />
+                        <Bar dataKey="income" name="Income" fill="hsl(142.1 76.2% 36.3%)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="expense" name="Expense" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </CardContent>
