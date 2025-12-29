@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { Home, List } from 'lucide-react';
+import { Home, List, Settings } from 'lucide-react';
 
 const links = [
   {
@@ -21,6 +21,11 @@ const links = [
     label: 'Transactions',
     icon: List,
   },
+  {
+    href: '/dashboard/settings',
+    label: 'Settings',
+    icon: Settings,
+  }
 ];
 
 export default function DashboardNav() {

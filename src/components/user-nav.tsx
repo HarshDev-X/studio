@@ -20,9 +20,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useFirebase } from '@/firebase';
+import { useRouter } from 'next/navigation';
 
 export default function UserNav() {
   const { auth, user } = useFirebase();
+  const router = useRouter();
   const avatarImage = PlaceHolderImages.find((p) => p.id === 'user-avatar-1');
 
   const handleSignOut = async () => {
@@ -49,7 +51,7 @@ export default function UserNav() {
             )}
             <AvatarFallback>
               {user?.displayName
-                ? user.displayName.charAt(0)
+                ? user.displayName.charAt(0).toUpperCase()
                 : user?.email?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
@@ -68,8 +70,12 @@ export default function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard">Profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/settings">Settings</Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>Log out</DropdownMenuItem>
