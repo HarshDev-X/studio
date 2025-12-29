@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Logo from "@/components/logo"
+import GoogleIcon from "@/components/google-icon"
 
 export default function SignupPage() {
   return (
@@ -22,11 +23,49 @@ export default function SignupPage() {
                 </div>
                 <CardTitle className="text-2xl font-headline">Sign Up</CardTitle>
                 <CardDescription>
-                    Enter your information to create an account
+                    Enter your information to create an account or sign in with a provider.
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <Button variant="outline" asChild>
+                            <Link href="/dashboard">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="mr-2 h-4 w-4"
+                                >
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                                Guest
+                            </Link>
+                        </Button>
+                        <Button variant="outline" asChild>
+                            <Link href="/dashboard">
+                                <GoogleIcon className="mr-2 h-4 w-4" />
+                                Google
+                            </Link>
+                        </Button>
+                    </div>
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">
+                            Or continue with
+                            </span>
+                        </div>
+                    </div>
                     <div className="grid gap-2">
                         <Label htmlFor="full-name">Full name</Label>
                         <Input id="full-name" placeholder="Max Robinson" required />
