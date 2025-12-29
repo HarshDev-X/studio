@@ -1,0 +1,137 @@
+/**
+ * This ruleset enforces a strict user-ownership model for the ExpenseFlow app.
+ *
+ * Core Philosophy:
+ * The security model is built on the principle that all data is private and
+ * belongs to a specific user. There are no public or shared collections.
+ * A user can only access data that exists within their own data tree.
+ *
+ * Data Structure:
+ * All application data, including transactions, is nested under a top-level
+ * `/users` collection. The path `/users/{userId}` serves as the root for all
+ * data associated with a single user, ensuring clear data segregation.
+ *
+ * Key Security Decisions:
+ * - Strict Ownership: All rules rely on the `isOwner()` function, which verifies
+ *   that the requesting user's UID matches the `{userId}` in the document path.
+ * - No Public Listing: It is impossible to list all users in the `/users`
+ *   collection. A user can only access their own document via its direct path.
+ * - Denormalization for Security: Transaction documents contain a `userId` field.
+ *   The rules enforce that this field matches the path on creation and is
+ *   immutable on update, guaranteeing relational integrity without costly `get()` calls.
+ * - Guest Access: Anonymous authentication ("guests") is supported. A guest user
+ *   is treated like any other signed-in user and can create their own private
+ *   data tree, but they cannot access data from any other user.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions to provide reusable, auditable, and clear logic.
+
+    /**
+     * Checks if a user is authenticated, including anonymous "guest" users.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Verifies that the currently authenticated user's UID matches the
+     * specified userId from the document path. This is the core of the
+     * ownership model.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * A stricter version of isOwner used for state-changing operations
+     * (update, delete). It ensures the document already exists before
+     * allowing the operation to proceed.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * Validates that the user profile document being created has an 'id'
+     * field that matches the user's auth UID. This enforces relational
+     * integrity between the document's path and its content.
+     */
+    function hasValidUserCreateData(userId) {
+      return request.resource.data.id == userId;
+    }
+
+    /**
+     * Enforces that the 'id' field of a user profile document cannot be
+     * changed after it has been created.
+     */
+    function hasValidUserUpdateData() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * Validates that the transaction document being created has a 'userId'
+     * field that matches the owner's auth UID from the path. This enforces
+     * relational integrity and ownership.
+     */
+    function hasValidTransactionCreateData(userId) {
+      return request.resource.data.userId == userId;
+    }
+
+
+
+    /**
+     * Enforces that the 'userId' field of a transaction document cannot be
+     * changed after it has been created, preventing transactions from being reassigned.
+     */
+    function hasValidTransactionUpdateData() {
+      return request.resource.data.userId == resource.data.id;
+    }
+
+    /**
+     * @description
+     *   Manages access to a user's own profile document.
+     * @path
+     *   /users/{userId}
+     * @allow
+     *   (create) A new user (auth.uid: 'user_abc') creating their own profile document at `/users/user_abc`.
+     *   (get) An existing user (auth.uid: 'user_abc') reading their own profile at `/users/user_abc`.
+     * @deny
+     *   (get) A user (auth.uid: 'user_xyz') trying to read another user's profile at `/users/user_abc`.
+     *   (create) A user (auth.uid: 'user_abc') trying to create a profile for someone else at `/users/user_xyz`.
+     * @principle
+     *   Restricts access to a user's own data tree and allows for self-creation of a user's root document.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Disallow listing subcollections; not applicable for a document path but explicit for security.
+      allow create: if isOwner(userId) && hasValidUserCreateData(userId);
+      allow update: if isExistingOwner(userId) && hasValidUserUpdateData();
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description
+     *   Controls access to a user's private financial transactions.
+     * @path
+     *   /users/{userId}/transactions/{transactionId}
+     * @allow
+     *   (create) A user (auth.uid: 'user_abc') creating a new transaction in their own subcollection.
+     *   (list) A user (auth.uid: 'user_abc') listing all transactions within `/users/user_abc/transactions`.
+     * @deny
+     *   (get) A user (auth.uid: 'user_xyz') trying to read a transaction from `/users/user_abc/transactions/{id}`.
+     *   (list) A user (auth.uid: 'user_xyz') trying to list transactions from another user's collection.
+     * @principle
+     *   Enforces document ownership for all operations within a user-specific subcollection.
+     */
+    match /users/{userId}/transactions/{transactionId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && hasValidTransactionCreateData(userId);
+      allow update: if isExistingOwner(userId) && hasValidTransactionUpdateData();
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}
