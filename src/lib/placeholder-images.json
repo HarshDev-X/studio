@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A person reviewing their finances on a laptop and phone, with charts and graphs visible.",
+      "imageUrl": "https://images.unsplash.com/photo-1706217803077-e5995369ad78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmaW5hbmNlJTIwcGxhbm5pbmd8ZW58MHx8fHwxNzY3MDMxNjA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "finance planning"
+    },
+    {
+      "id": "feature1",
+      "description": "Close-up of a mobile phone screen showing an expense tracking app with Indian Rupee symbols.",
+      "imageUrl": "https://images.unsplash.com/photo-1758876201966-a680772a41ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2JpbGUlMjBmaW5hbmNlfGVufDB8fHx8MTc2NzAzMTYwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mobile finance"
+    },
+    {
+      "id": "feature2",
+      "description": "A diverse group of students collaborating and discussing their budget.",
+      "imageUrl": "https://images.unsplash.com/photo-1620829813947-ef4246827355?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdHVkZW50cyUyMGRpc2N1c3Npbmd8ZW58MHx8fHwxNzY3MDMxNjA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "students discussing"
+    },
+    {
+      "id": "user-avatar-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://images.unsplash.com/photo-1750535135704-f9a5dba67e46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGVyc29uJTIwYXZhdGFyfGVufDB8fHx8MTc2Njk1NDEwNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "user-avatar-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://images.unsplash.com/photo-1750535135704-f9a5dba67e46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGVyc29uJTIwYXZhdGFyfGVufDB8fHx8MTc2Njk1NDEwNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    }
+  ]
 }
