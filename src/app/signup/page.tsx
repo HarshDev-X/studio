@@ -23,9 +23,13 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   updateProfile,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
 } from 'firebase/auth';
 import { FormEvent, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function SignupPage() {
   const { auth, user, isUserLoading } = useFirebase();
@@ -42,6 +46,7 @@ export default function SignupPage() {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
+      await setPersistence(auth, browserLocalPersistence); // Always remember Google sign-ins
       await signInWithPopup(auth, provider);
     } catch (error: any) {
       toast({
@@ -52,9 +57,18 @@ export default function SignupPage() {
     }
   };
 
-  const handleGuestSignIn = () => {
+  const handleGuestSignIn = async () => {
     if (!auth) return;
-    initiateAnonymousSignIn(auth);
+    try {
+      await setPersistence(auth, browserSessionPersistence); // Guests are session-only
+      initiateAnonymousSignIn(auth);
+    } catch (error: any) {
+       toast({
+        variant: 'destructive',
+        title: 'Sign-in Failed',
+        description: error.message,
+      });
+    }
   };
 
   const handleEmailSignUp = async (event: FormEvent<HTMLFormElement>) => {
@@ -64,10 +78,15 @@ export default function SignupPage() {
     const fullName = formData.get('full-name') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
+    const rememberMe = formData.get('remember-me') === 'on';
 
     try {
+      await setPersistence(
+        auth,
+        rememberMe ? browserLocalPersistence : browserSessionPersistence
+      );
       const userCredential = await initiateEmailSignUp(auth, email, password);
-      
+
       // After sign up, Firebase automatically signs the user in if there's no error.
       // We can get the user from the credential and update the profile.
       if (userCredential && userCredential.user) {
@@ -175,6 +194,15 @@ export default function SignupPage() {
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
                 <Input id="password" name="password" type="password" />
+              </div>
+               <div className="flex items-center space-x-2">
+                <Checkbox id="remember-me" name="remember-me" />
+                <Label
+                  htmlFor="remember-me"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Remember me
+                </Label>
               </div>
               <Button type="submit" className="w-full">
                 Create an account

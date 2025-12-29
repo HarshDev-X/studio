@@ -14,11 +14,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { useFirebase } from '@/firebase';
-import {
-  initiateEmailSignIn,
-} from '@/firebase/non-blocking-login';
+import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { FormEvent, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+} from 'firebase/auth';
 
 export default function LoginPage() {
   const { auth, user, isUserLoading } = useFirebase();
@@ -38,8 +42,13 @@ export default function LoginPage() {
     const formData = new FormData(event.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
+    const rememberMe = formData.get('remember-me') === 'on';
 
     try {
+      await setPersistence(
+        auth,
+        rememberMe ? browserLocalPersistence : browserSessionPersistence
+      );
       initiateEmailSignIn(auth, email, password);
     } catch (error: any) {
       toast({
@@ -96,6 +105,15 @@ export default function LoginPage() {
                 </Link>
               </div>
               <Input id="password" name="password" type="password" required />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="remember-me" name="remember-me" />
+              <Label
+                htmlFor="remember-me"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Remember me
+              </Label>
             </div>
             <Button type="submit" className="w-full">
               Login
