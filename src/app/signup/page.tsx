@@ -66,26 +66,23 @@ export default function SignupPage() {
     const password = formData.get('password') as string;
 
     try {
-      await initiateEmailSignUp(auth, email, password);
-      // After sign up, Firebase automatically signs the user in.
-      // We can listen for the auth state change and then update the profile.
-      const unsubscribe = auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          try {
-            await updateProfile(user, { displayName: fullName });
-            // Profile updated, now we can safely navigate
-             router.push('/dashboard');
-          } catch (updateError: any) {
-             toast({
-              variant: 'destructive',
-              title: 'Profile Update Failed',
-              description: updateError.message,
-            });
-          } finally {
-            unsubscribe(); // Clean up listener
-          }
+      const userCredential = await initiateEmailSignUp(auth, email, password);
+      
+      // After sign up, Firebase automatically signs the user in if there's no error.
+      // We can get the user from the credential and update the profile.
+      if (userCredential && userCredential.user) {
+        try {
+          await updateProfile(userCredential.user, { displayName: fullName });
+          // Profile updated, now we can safely navigate
+          router.push('/dashboard');
+        } catch (updateError: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Profile Update Failed',
+            description: updateError.message,
+          });
         }
-      });
+      }
     } catch (error: any) {
       toast({
         variant: 'destructive',
