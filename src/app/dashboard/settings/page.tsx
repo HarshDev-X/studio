@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,8 @@ import { useFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { updateProfileAction } from '@/lib/actions';
 import { useEffect } from 'react';
+import { signOut } from 'firebase/auth';
+import { LogOut } from 'lucide-react';
 
 const profileSchema = z.object({
   displayName: z.string().min(1, 'Name is required'),
@@ -26,7 +28,7 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function SettingsPage() {
-  const { user } = useFirebase();
+  const { user, auth } = useFirebase();
   const { toast } = useToast();
   
   const {
@@ -63,12 +65,18 @@ export default function SettingsPage() {
     }
   };
 
+  const handleSignOut = async () => {
+    if (auth) {
+      await signOut(auth);
+    }
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <h2 className="text-3xl font-headline font-bold tracking-tight">
         Settings
       </h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
@@ -109,6 +117,21 @@ export default function SettingsPage() {
                 {isSubmitting ? 'Saving...' : 'Save changes'}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Actions</CardTitle>
+            <CardDescription>
+              Manage your account session.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="destructive" onClick={handleSignOut} className="w-full">
+              <LogOut className="mr-2 h-4 w-4" />
+              Log Out
+            </Button>
           </CardContent>
         </Card>
       </div>
