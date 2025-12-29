@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'ExpenseWise',
-  description: 'Full-Stack Expense Tracker for Indian Users',
+  title: 'SaaSApp',
+  description: 'A modern SaaS application',
 };
 
 export default function RootLayout({
