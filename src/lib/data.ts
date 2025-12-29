@@ -1,128 +1,79 @@
 import type { Transaction } from "@/lib/types";
+import { 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc,
+  doc,
+  orderBy
+} from "firebase/firestore";
+import { initializeFirebase } from "@/firebase";
 
-// Mock user ID for development
-const MOCK_USER_ID = "user_123";
+// This file will now interact with Firestore
 
-const today = new Date();
-const yesterday = new Date(today);
-yesterday.setDate(yesterday.getDate() - 1);
-const lastMonth = new Date(today);
-lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-export const mockTransactions: Transaction[] = [
-  {
-    id: "txn_1",
-    userId: MOCK_USER_ID,
-    type: "expense",
-    amount: 4200,
-    category: "Hostel",
-    date: lastMonth.toISOString().split("T")[0],
-    description: "Monthly hostel fees",
-  },
-  {
-    id: "txn_2",
-    userId: MOCK_USER_ID,
-    type: "income",
-    amount: 15000,
-    category: "Others",
-    date: lastMonth.toISOString().split("T")[0],
-    description: "Monthly stipend",
-  },
-  {
-    id: "txn_3",
-    userId: MOCK_USER_ID,
-    type: "expense",
-    amount: 250,
-    category: "Food",
-    date: yesterday.toISOString().split("T")[0],
-    description: "Lunch with friends",
-  },
-  {
-    id: "txn_4",
-    userId: MOCK_USER_ID,
-    type: "expense",
-    amount: 80,
-    category: "Travel",
-    date: yesterday.toISOString().split("T")[0],
-    description: "Bus fare",
-  },
-  {
-    id: "txn_5",
-    userId: MOCK_USER_ID,
-    type: "expense",
-    amount: 1200,
-    category: "Shopping",
-    date: yesterday.toISOString().split("T")[0],
-    description: "New headphones",
-  },
-  {
-    id: "txn_6",
-    userId: MOCK_USER_ID,
-    type: "income",
-    amount: 2000,
-    category: "Others",
-    date: today.toISOString().split("T")[0],
-    description: "Freelance project payment",
-  },
-  {
-    id: "txn_7",
-    userId: MOCK_USER_ID,
-    type: "expense",
-    amount: 150,
-    category: "Food",
-    date: today.toISOString().split("T")[0],
-    description: "Evening snacks",
-  },
-  {
-    id: "txn_8",
-    userId: MOCK_USER_ID,
-    type: "expense",
-    amount: 550,
-    category: "Bills",
-    date: today.toISOString().split("T")[0],
-    description: "Phone bill",
-  },
-];
-
-// In-memory store for transactions
-let transactionsStore: Transaction[] = [...mockTransactions];
-
-// Simulate API latency
-const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+async function getFirestoreAndUser() {
+  const { firestore, auth } = initializeFirebase();
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated");
+  return { firestore, user };
+}
 
 export async function getTransactions(): Promise<Transaction[]> {
-  await delay(100);
-  return transactionsStore.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const { firestore, user } = await getFirestoreAndUser();
+  const transactionsCol = collection(firestore, "users", user.uid, "transactions");
+  const q = query(transactionsCol, orderBy("date", "desc"));
+  const querySnapshot = await getDocs(q);
+  
+  const transactions: Transaction[] = [];
+  querySnapshot.forEach((doc) => {
+    transactions.push({ id: doc.id, ...doc.data() } as Transaction);
+  });
+  return transactions;
 }
 
 export async function addTransaction(transaction: Omit<Transaction, "id" | "userId">): Promise<Transaction> {
-  await delay(100);
-  const newTransaction: Transaction = {
+  const { firestore, user } = await getFirestoreAndUser();
+  const transactionsCol = collection(firestore, "users", user.uid, "transactions");
+  
+  const newTransactionData = {
     ...transaction,
-    id: `txn_${Date.now()}`,
-    userId: MOCK_USER_ID,
+    userId: user.uid,
+    date: new Date(transaction.date).toISOString()
   };
-  transactionsStore.unshift(newTransaction);
-  return newTransaction;
+
+  const docRef = await addDoc(transactionsCol, newTransactionData);
+  return { id: docRef.id, ...newTransactionData };
 }
 
-export async function updateTransaction(id: string, updates: Partial<Transaction>): Promise<Transaction> {
-  await delay(100);
-  let transactionToUpdate = transactionsStore.find(t => t.id === id);
-  if (!transactionToUpdate) {
-    throw new Error("Transaction not found");
+export async function updateTransaction(id: string, updates: Partial<Omit<Transaction, 'id' | 'userId'>>): Promise<Transaction> {
+  const { firestore, user } = await getFirestoreAndUser();
+  const transactionDoc = doc(firestore, "users", user.uid, "transactions", id);
+  
+  const updateData = { ...updates };
+  if (updates.date) {
+    updateData.date = new Date(updates.date).toISOString();
   }
-  transactionToUpdate = { ...transactionToUpdate, ...updates };
-  transactionsStore = transactionsStore.map(t => (t.id === id ? transactionToUpdate! : t));
-  return transactionToUpdate;
+
+  await updateDoc(transactionDoc, updateData);
+
+  const updatedTransaction: Transaction = {
+    id: id,
+    userId: user.uid,
+    type: updates.type!,
+    amount: updates.amount!,
+    category: updates.category!,
+    date: updates.date!,
+    description: updates.description,
+  }
+  return updatedTransaction;
 }
 
 export async function deleteTransaction(id: string): Promise<{ success: boolean }> {
-  await delay(100);
-  const initialLength = transactionsStore.length;
-  transactionsStore = transactionsStore.filter(t => t.id !== id);
-  if (transactionsStore.length === initialLength) {
-    throw new Error("Transaction not found");
-  }
+  const { firestore, user } = await getFirestoreAndUser();
+  const transactionDoc = doc(firestore, "users", user.uid, "transactions", id);
+  await deleteDoc(transactionDoc);
   return { success: true };
 }

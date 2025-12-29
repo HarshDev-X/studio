@@ -8,10 +8,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import AddTransaction from "@/components/transactions/add-transaction";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+async function TransactionsData() {
+  const transactions = await getTransactions();
+  return <TransactionsTable transactions={transactions} />;
+}
+
+function TransactionsSkeleton() {
+  return <Skeleton className="h-96 w-full" />;
+}
 
 export default async function TransactionsPage() {
-  const transactions = await getTransactions();
-
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -27,7 +36,9 @@ export default async function TransactionsPage() {
             <CardDescription>A list of all your recorded transactions.</CardDescription>
           </CardHeader>
           <CardContent>
-            <TransactionsTable transactions={transactions} />
+            <Suspense fallback={<TransactionsSkeleton />}>
+              <TransactionsData />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

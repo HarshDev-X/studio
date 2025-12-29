@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { Transaction } from '@/lib/types';
-import { IndianRupee, MoreHorizontal, ArrowUpDown, Trash, Edit } from 'lucide-react';
+import { MoreHorizontal, ArrowUpDown, Trash, Edit } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { deleteTransactionAction } from '@/lib/actions';
@@ -170,7 +170,7 @@ export default function TransactionsTable({ transactions }: TransactionsTablePro
     },
     initialState: {
         pagination: {
-            pageSize: 5,
+            pageSize: 10,
         }
     }
   });
