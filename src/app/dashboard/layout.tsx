@@ -1,6 +1,7 @@
 'use client';
 
 import type React from 'react';
+import { useEffect } from 'react';
 import {
   SidebarProvider,
   Sidebar,
@@ -23,17 +24,18 @@ export default function DashboardLayout({
   const { user, isUserLoading } = useFirebase();
   const router = useRouter();
 
-  if (isUserLoading) {
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.replace('/login');
+    }
+  }, [isUserLoading, user, router]);
+
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <p>Loading...</p>
       </div>
     );
-  }
-
-  if (!user) {
-    router.replace('/login');
-    return null;
   }
 
   return (
