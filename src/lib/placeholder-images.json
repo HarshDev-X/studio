@@ -1,58 +1,56 @@
-{
-  "placeholderImages": [
-    {
-      "id": "hero",
-      "description": "A person reviewing their finances on a laptop and phone, with charts and graphs visible.",
-      "imageUrl": "https://images.unsplash.com/photo-1706217803077-e5995369ad78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmaW5hbmNlJTIwcGxhbm5pbmd8ZW58MHx8fHwxNzY3MDMxNjA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "finance planning"
-    },
-    {
-      "id": "feature1",
-      "description": "Close-up of a mobile phone screen showing an expense tracking app with Indian Rupee symbols.",
-      "imageUrl": "https://images.unsplash.com/photo-1758876201966-a680772a41ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2JpbGUlMjBmaW5hbmNlfGVufDB8fHx8fDE3NjcwMzE2MDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "mobile finance"
-    },
-    {
-      "id": "feature2",
-      "description": "A diverse group of students collaborating and discussing their budget.",
-      "imageUrl": "https://images.unsplash.com/photo-1620829813947-ef4246827355?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdHVkZW50cyUyMGRpc2N1c3Npbmd8ZW58MHx8fHwxNzY3MDMxNjA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "students discussing"
-    },
-    {
-      "id": "user-avatar-1",
-      "description": "Cartoon avatar of a smiling man with glasses.",
-      "imageUrl": "https://images.unsplash.com/photo-1629424269389-192b70b5514a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "cartoon portrait"
-    },
-    {
-      "id": "user-avatar-2",
-      "description": "Cartoon avatar of a woman with red hair.",
-      "imageUrl": "https://images.unsplash.com/photo-1639747534413-a44b1c2f0985?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "cartoon portrait"
-    },
-    {
-      "id": "user-avatar-3",
-      "description": "Cartoon avatar of a man with a beard.",
-      "imageUrl": "https://images.unsplash.com/photo-1629424269389-d3bbfb8a8b13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "cartoon portrait"
-    },
-    {
-      "id": "user-avatar-4",
-      "description": "Cartoon avatar of a woman with curly hair.",
-      "imageUrl": "https://images.unsplash.com/photo-1629424269389-6515a4b172a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "cartoon portrait"
-    },
-    {
-      "id": "user-avatar-5",
-      "description": "Cartoon avatar of a young boy.",
-      "imageUrl": "https://images.unsplash.com/photo-1639747534413-a44b1c2f0985?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjYXJ0b29uJTIwYm95fGVufDB8fHx8MTcyMTg0MjEwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "cartoon boy"
-    },
-    {
-      "id": "user-avatar-6",
-      "description": "Cartoon avatar of a young girl with pigtails.",
-      "imageUrl": "https://images.unsplash.com/photo-1640960543409-dbe56ccc30e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjYXJ0b29uJTIwZ2lybHxlbnwwfHx8fDE3MjE4NDIxNDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "cartoon girl"
-    }
-  ]
-}
+[
+  {
+    "id": "hero",
+    "description": "A person reviewing their finances on a laptop and phone, with charts and graphs visible.",
+    "imageUrl": "https://images.unsplash.com/photo-1706217803077-e5995369ad78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmaW5hbmNlJTIwcGxhbm5pbmd8ZW58MHx8fHwxNzY3MDMxNjA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "finance planning"
+  },
+  {
+    "id": "feature1",
+    "description": "Close-up of a mobile phone screen showing an expense tracking app with Indian Rupee symbols.",
+    "imageUrl": "https://images.unsplash.com/photo-1758876201966-a680772a41ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2JpbGUlMjBmaW5hbmNlfGVufDB8fHx8fDE3NjcwMzE2MDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "mobile finance"
+  },
+  {
+    "id": "feature2",
+    "description": "A diverse group of students collaborating and discussing their budget.",
+    "imageUrl": "https://images.unsplash.com/photo-1620829813947-ef4246827355?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdHVkZW50cyUyMGRpc2N1c3Npbmd8ZW58MHx8fHwxNzY3MDMxNjA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "students discussing"
+  },
+  {
+    "id": "user-avatar-1",
+    "description": "Cartoon avatar of a smiling man with glasses.",
+    "imageUrl": "https://images.unsplash.com/photo-1629424269389-192b70b5514a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "cartoon portrait"
+  },
+  {
+    "id": "user-avatar-2",
+    "description": "Cartoon avatar of a woman with red hair.",
+    "imageUrl": "https://images.unsplash.com/photo-1639747534413-a44b1c2f0985?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "cartoon portrait"
+  },
+  {
+    "id": "user-avatar-3",
+    "description": "Cartoon avatar of a man with a beard.",
+    "imageUrl": "https://images.unsplash.com/photo-1629424269389-d3bbfb8a8b13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "cartoon portrait"
+  },
+  {
+    "id": "user-avatar-4",
+    "description": "Cartoon avatar of a woman with curly hair.",
+    "imageUrl": "https://images.unsplash.com/photo-1629424269389-6515a4b172a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjYXJ0b29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzIxODQyMDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "cartoon portrait"
+  },
+  {
+    "id": "user-avatar-5",
+    "description": "Cartoon avatar of a young boy.",
+    "imageUrl": "https://images.unsplash.com/photo-1639747534413-a44b1c2f0985?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjYXJ0b29uJTIwYm95fGVufDB8fHx8MTcyMTg0MjEwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "cartoon boy"
+  },
+  {
+    "id": "user-avatar-6",
+    "description": "Cartoon avatar of a young girl with pigtails.",
+    "imageUrl": "https://images.unsplash.com/photo-1640960543409-dbe56ccc30e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjYXJ0b29uJTIwZ2lybHxlbnwwfHx8fDE3MjE4NDIxNDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageHint": "cartoon girl"
+  }
+]
