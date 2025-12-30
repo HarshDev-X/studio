@@ -20,9 +20,16 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-const avatars = PlaceHolderImages.filter(p => p.id.startsWith('user-avatar'));
+const avatars = [
+    { id: 'avatar-1', url: 'https://picsum.photos/seed/avatar1/100/100', alt: 'Avatar 1' },
+    { id: 'avatar-2', url: 'https://picsum.photos/seed/avatar2/100/100', alt: 'Avatar 2' },
+    { id: 'avatar-3', url: 'https://picsum.photos/seed/avatar3/100/100', alt: 'Avatar 3' },
+    { id: 'avatar-4', url: 'https://picsum.photos/seed/avatar4/100/100', alt: 'Avatar 4' },
+    { id: 'avatar-5', url: 'https://picsum.photos/seed/avatar5/100/100', alt: 'Avatar 5' },
+    { id: 'avatar-6', url: 'https://picsum.photos/seed/avatar6/100/100', alt: 'Avatar 6' },
+];
+
 
 export default function OnboardingPage() {
   const { auth, firestore, user, isUserLoading } = useFirebase();
@@ -126,21 +133,21 @@ export default function OnboardingPage() {
                   <div
                     key={avatar.id}
                     className="relative cursor-pointer"
-                    onClick={() => setSelectedAvatar(avatar.imageUrl)}
+                    onClick={() => setSelectedAvatar(avatar.url)}
                   >
                     <Image
-                      src={avatar.imageUrl}
-                      alt={avatar.description}
+                      src={avatar.url}
+                      alt={avatar.alt}
                       width={100}
                       height={100}
                       className={cn(
                         'rounded-full border-4 transition-all',
-                        selectedAvatar === avatar.imageUrl
+                        selectedAvatar === avatar.url
                           ? 'border-primary'
                           : 'border-transparent'
                       )}
                     />
-                    {selectedAvatar === avatar.imageUrl && (
+                    {selectedAvatar === avatar.url && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-full bg-primary/50">
                         <Check className="h-8 w-8 text-primary-foreground" />
                       </div>
