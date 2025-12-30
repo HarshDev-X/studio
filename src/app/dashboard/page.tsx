@@ -16,9 +16,9 @@ import {
 import RecentTransactions from "@/components/dashboard/recent-transactions";
 import OverviewCharts from "@/components/dashboard/overview-charts";
 import TransactionSummary from "@/components/transactions/transaction-summary";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { collection, query, orderBy, where } from "firebase/firestore";
+import { collection, query, orderBy } from "firebase/firestore";
 import AddTransaction from "@/components/transactions/add-transaction";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { DateRange } from "react-day-picker";
@@ -71,6 +71,7 @@ function DashboardData() {
   }, [allTransactions, dateRange]);
 
   const recentTransactions = useMemo(() => {
+    if (!filteredTransactions) return [];
     return filteredTransactions.slice(0, 5);
   }, [filteredTransactions]);
 
