@@ -9,12 +9,15 @@ import {
   SidebarContent,
   SidebarTrigger,
   SidebarInset,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import Logo from '@/components/logo';
 import DashboardNav from '@/components/dashboard-nav';
 import UserNav from '@/components/user-nav';
 import { useFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Share2, Star } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -52,6 +55,18 @@ export default function DashboardLayout({
         <SidebarContent>
           <DashboardNav />
         </SidebarContent>
+        <SidebarFooter>
+            <div className="flex flex-col gap-2">
+                 <Button variant="ghost" className="justify-start">
+                    <Share2 className="mr-2" />
+                    Share App
+                </Button>
+                <Button variant="ghost" className="justify-start">
+                    <Star className="mr-2" />
+                    Rate App
+                </Button>
+            </div>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
