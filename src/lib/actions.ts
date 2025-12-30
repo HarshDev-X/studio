@@ -1,5 +1,10 @@
 'use server';
 
+// This file is a core part of your application's BACKEND.
+// It contains "Server Actions", which are secure, server-side functions
+// that you can call directly from your frontend components.
+// This is a modern approach to building web apps with Next.js.
+
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { addTransaction, updateTransaction, deleteTransaction } from './data';

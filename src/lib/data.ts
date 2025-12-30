@@ -1,3 +1,7 @@
+// This file is a core part of your application's BACKEND.
+// It contains the data access logic that communicates with your database (Firestore).
+// These functions run on the server to securely fetch and modify your app's data.
+
 import type { Transaction } from "@/lib/types";
 import { 
   collection, 
