@@ -1,137 +1,164 @@
 /**
- * This ruleset enforces a strict user-ownership model for the ExpenseFlow app.
+ * =================================================================================
+ * CRITICAL NOTE FOR THE DEVELOPER
+ * =================================================================================
+ * The error you reported ('auth/operation-not-allowed') is an AUTHENTICATION issue,
+ * not a Firestore Security Rules issue. It means the "Phone Number" sign-in provider
+ * is not enabled for your Firebase project.
+ *
+ * TO FIX THIS ERROR:
+ * 1. Go to the Firebase Console (https://console.firebase.google.com/).
+ * 2. Select your project.
+ * 3. Go to the "Authentication" section.
+ * 4. Click on the "Sign-in method" tab.
+ * 5. Find "Phone" in the list of providers and enable it.
+ *
+ * These security rules are designed to work correctly once authentication is
+ * properly configured.
+ * =================================================================================
+ */
+
+/**
+ * @title ExpenseFlow Firestore Security Rules
+ * @author Firebase Rules Architect
+ * @version 1.0
+ *
+ * @description
+ * This ruleset enforces a strict user-ownership model for the ExpenseFlow application.
+ * All user-specific data, including profiles and financial transactions, is
+ * stored within a dedicated data tree for each user, ensuring strong privacy
+ * and preventing data access between users.
  *
  * Core Philosophy:
- * The security model is built on the principle that all data is private and
- * belongs to a specific user. There are no public or shared collections.
- * A user can only access data that exists within their own data tree.
+ * The security model is built on "path-based ownership." Access to any document
+ * is determined by its location in the database, specifically whether it resides
+ * under the path of the currently authenticated user. This approach is highly
+ * performant as it avoids extra database reads (`get()` calls) for authorization.
  *
  * Data Structure:
- * All application data, including transactions, is nested under a top-level
- * `/users` collection. The path `/users/{userId}` serves as the root for all
- * data associated with a single user, ensuring clear data segregation.
+ * - /users/{userId}: Stores the public profile for a single user.
+ * - /users/{userId}/transactions/{transactionId}: A subcollection containing all
+ *   financial transactions owned by that user.
  *
  * Key Security Decisions:
- * - Strict Ownership: All rules rely on the `isOwner()` function, which verifies
- *   that the requesting user's UID matches the `{userId}` in the document path.
- * - No Public Listing: It is impossible to list all users in the `/users`
- *   collection. A user can only access their own document via its direct path.
- * - Denormalization for Security: Transaction documents contain a `userId` field.
- *   The rules enforce that this field matches the path on creation and is
- *   immutable on update, guaranteeing relational integrity without costly `get()` calls.
- * - Guest Access: Anonymous authentication ("guests") is supported. A guest user
- *   is treated like any other signed-in user and can create their own private
- *   data tree, but they cannot access data from any other user.
+ * - Default Deny: All access is denied by default. Rules only grant permissions explicitly.
+ * - Strict Ownership: Users can only read or write data within their own
+ *   document tree (i.e., `/users/{auth.uid}/**`).
+ * - No User Enumeration: Listing the top-level `/users` collection is disallowed
+ *   to prevent attackers from scraping a list of all application users.
+ * - Relational Integrity: On creation, rules ensure that documents contain an
+ *   internal `userId` or `id` field that matches the `userId` in the path,
+ *   enforcing data consistency. These relational IDs are immutable.
+ *
+ * Denormalization & Prototyping:
+ * These rules are in "Prototyping Mode." They strictly enforce WHO can access data
+ * but are flexible on the SHAPE of that data. We only validate fields critical
+ * for authorization (like `userId`). Other schema fields (`amount`, `category`,
+ * `description`) are not validated to allow for rapid frontend development and iteration.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions to provide reusable, auditable, and clear logic.
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
 
     /**
-     * Checks if a user is authenticated, including anonymous "guest" users.
+     * Checks if a user is authenticated.
      */
     function isSignedIn() {
       return request.auth != null;
     }
 
     /**
-     * Verifies that the currently authenticated user's UID matches the
-     * specified userId from the document path. This is the core of the
-     * ownership model.
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     * This is the core of our ownership-based security model.
      */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
     /**
-     * A stricter version of isOwner used for state-changing operations
-     * (update, delete). It ensures the document already exists before
-     * allowing the operation to proceed.
+     * Ensures an operation is performed by the owner on an existing document.
+     * Crucial for preventing writes to non-existent paths.
      */
     function isExistingOwner(userId) {
       return isOwner(userId) && resource != null;
     }
-
+    
+    // --- Prototyping Data Validation Helpers ---
+    
     /**
-     * Validates that the user profile document being created has an 'id'
-     * field that matches the user's auth UID. This enforces relational
-     * integrity between the document's path and its content.
+     * Validates required fields for creating a new user document.
+     * Ensures the internal ID matches the document path ID.
      */
     function hasValidUserCreateData(userId) {
-      return request.resource.data.id == userId;
+      let data = request.resource.data;
+      return data.id == userId;
     }
-
+    
     /**
-     * Enforces that the 'id' field of a user profile document cannot be
-     * changed after it has been created.
+     * Ensures the core relational ID of a user document cannot be changed.
      */
-    function hasValidUserUpdateData() {
+    function isUserImmutable() {
       return request.resource.data.id == resource.data.id;
     }
-
+    
     /**
-     * Validates that the transaction document being created has a 'userId'
-     * field that matches the owner's auth UID from the path. This enforces
-     * relational integrity and ownership.
+     * Validates required fields for creating a new transaction document.
+     * Ensures internal IDs (`userId`, `id`) match the document path.
      */
-    function hasValidTransactionCreateData(userId) {
-      return request.resource.data.userId == userId;
+    function hasValidTransactionCreateData(userId, transactionId) {
+      let data = request.resource.data;
+      return data.userId == userId && data.id == transactionId;
+    }
+    
+    /**
+     * Ensures the core relational IDs of a transaction cannot be changed.
+     */
+    function isTransactionImmutable() {
+      let incomingData = request.resource.data;
+      let existingData = resource.data;
+      return incomingData.userId == existingData.userId && incomingData.id == existingData.id;
     }
 
-
-
-    /**
-     * Enforces that the 'userId' field of a transaction document cannot be
-     * changed after it has been created, preventing transactions from being reassigned.
-     */
-    function hasValidTransactionUpdateData() {
-      return request.resource.data.userId == resource.data.id;
-    }
+    // -------------------------------------------------------------------------
+    // Collection Rules
+    // -------------------------------------------------------------------------
 
     /**
-     * @description
-     *   Manages access to a user's own profile document.
-     * @path
-     *   /users/{userId}
-     * @allow
-     *   (create) A new user (auth.uid: 'user_abc') creating their own profile document at `/users/user_abc`.
-     *   (get) An existing user (auth.uid: 'user_abc') reading their own profile at `/users/user_abc`.
-     * @deny
-     *   (get) A user (auth.uid: 'user_xyz') trying to read another user's profile at `/users/user_abc`.
-     *   (create) A user (auth.uid: 'user_abc') trying to create a profile for someone else at `/users/user_xyz`.
-     * @principle
-     *   Restricts access to a user's own data tree and allows for self-creation of a user's root document.
+     * @description Rules for a user's profile document.
+     * @path /users/{userId}
+     * @allow (get) An authenticated user to read their own profile.
+     * @allow (create) A new user to create their own profile document.
+     * @deny (list) Anyone from listing all users in the top-level collection.
+     * @deny (update) A user trying to modify another user's profile.
+     * @principle Restricts access to a user's own data tree and allows self-creation.
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
-      allow list: if false; // Disallow listing subcollections; not applicable for a document path but explicit for security.
+      allow list: if false; // Disallow listing all users for security
       allow create: if isOwner(userId) && hasValidUserCreateData(userId);
-      allow update: if isExistingOwner(userId) && hasValidUserUpdateData();
+      allow update: if isExistingOwner(userId) && isUserImmutable();
       allow delete: if isExistingOwner(userId);
-    }
 
-    /**
-     * @description
-     *   Controls access to a user's private financial transactions.
-     * @path
-     *   /users/{userId}/transactions/{transactionId}
-     * @allow
-     *   (create) A user (auth.uid: 'user_abc') creating a new transaction in their own subcollection.
-     *   (list) A user (auth.uid: 'user_abc') listing all transactions within `/users/user_abc/transactions`.
-     * @deny
-     *   (get) A user (auth.uid: 'user_xyz') trying to read a transaction from `/users/user_abc/transactions/{id}`.
-     *   (list) A user (auth.uid: 'user_xyz') trying to list transactions from another user's collection.
-     * @principle
-     *   Enforces document ownership for all operations within a user-specific subcollection.
-     */
-    match /users/{userId}/transactions/{transactionId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && hasValidTransactionCreateData(userId);
-      allow update: if isExistingOwner(userId) && hasValidTransactionUpdateData();
-      allow delete: if isExistingOwner(userId);
+      /**
+       * @description Rules for a user's private financial transactions.
+       * @path /users/{userId}/transactions/{transactionId}
+       * @allow (create) An authenticated user to create a transaction for themselves.
+       * @allow (list) An authenticated user to list their own transactions.
+       * @deny (get) A user trying to read another user's transaction.
+       * @deny (delete) A user trying to delete another user's transaction.
+       * @principle Enforces strict ownership on a private subcollection.
+       */
+      match /transactions/{transactionId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && hasValidTransactionCreateData(userId, transactionId);
+        allow update: if isExistingOwner(userId) && isTransactionImmutable();
+        allow delete: if isExistingOwner(userId);
+      }
     }
   }
 }

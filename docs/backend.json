@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "User": {
@@ -9,7 +8,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the User entity."
+          "description": "Unique identifier for the user entity."
         },
         "name": {
           "type": "string",
@@ -22,7 +21,7 @@
         },
         "createdAt": {
           "type": "string",
-          "description": "The timestamp when the user account was created.",
+          "description": "Timestamp indicating when the user account was created.",
           "format": "date-time"
         }
       },
@@ -37,11 +36,11 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Transaction",
       "type": "object",
-      "description": "Represents a financial transaction (income or expense).",
+      "description": "Represents a financial transaction (income or expense) recorded by a user.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Transaction entity."
+          "description": "Unique identifier for the transaction entity."
         },
         "userId": {
           "type": "string",
@@ -49,23 +48,17 @@
         },
         "type": {
           "type": "string",
-          "description": "The type of transaction (income or expense).",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
+          "description": "The type of transaction: income or expense.",
+          "format": "enum"
         },
         "amount": {
           "type": "number",
-          "description": "The amount of the transaction in INR."
+          "description": "The transaction amount in Indian Rupees (INR)."
         },
         "category": {
           "type": "string",
-          "description": "The category of the transaction (Food, Travel, Rent, Hostel, Shopping, Bills, Others).",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
+          "description": "The category of the transaction (e.g., Food, Travel, Hostel).",
+          "format": "enum"
         },
         "date": {
           "type": "string",
@@ -74,11 +67,11 @@
         },
         "description": {
           "type": "string",
-          "description": "A description of the transaction (optional)."
+          "description": "Optional description or notes for the transaction."
         },
         "createdAt": {
           "type": "string",
-          "description": "The timestamp when the transaction was created.",
+          "description": "Timestamp indicating when the transaction was created.",
           "format": "date-time"
         }
       },
@@ -96,9 +89,7 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous",
-      "google.com",
-      "phone"
+      "anonymous"
     ]
   },
   "firestore": {
@@ -110,7 +101,7 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profile information.  Path-based ownership ensures only the user can access their own profile data.",
+          "description": "Stores user profiles.  Path-based ownership ensures only the authenticated user (or admin, if roles are implemented) can access their profile data.",
           "params": [
             {
               "name": "userId",
@@ -126,7 +117,7 @@
           "schema": {
             "$ref": "#/backend/entities/Transaction"
           },
-          "description": "Stores transaction data for each user. Path-based ownership ensures only the user can access their own transaction data.",
+          "description": "Stores transaction data for each user. Path-based ownership ensures that only the authenticated user can access their own transaction data.",
           "params": [
             {
               "name": "userId",
@@ -140,6 +131,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to ensure Authorization Independence, clarity, and scalability for the ExpenseFlow application. The primary principle applied is Authorization Independence via Denormalization, avoiding `get()` calls in security rules by denormalizing authorization data.  The structure also segregates data based on access needs to simplify security rules and support secure `list` operations (QAPs).  Since user data is private, path-based ownership is used to associate transactions with users, establishing a clear ownership hierarchy. This approach simplifies security rules and enables efficient data retrieval and management."
+    "reasoning": "The Firestore data structure is designed to ensure security, scalability, and ease of debugging, in accordance with the defined principles.  Authorization Independence is achieved through path-based ownership for user data and avoids the need for `get()` calls in security rules. The structure also supports the required QAPs by segregating user-owned data using hierarchical paths. This segregation ensures that list operations are secure. Private user data is stored under `/users/{userId}` to enforce ownership.  The `transactions` subcollection resides under `/users/{userId}` guaranteeing only the authenticated user can access their own transactions."
   }
 }
