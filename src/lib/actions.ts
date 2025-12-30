@@ -33,8 +33,8 @@ export async function addTransactionAction(formData: FormData) {
     }
 
     await addTransaction(app.firestore, app.auth.currentUser.uid, validatedFields.data);
-    revalidatePath('/dashboard/transactions');
-    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/transactions', 'layout');
+    revalidatePath('/dashboard', 'layout');
 }
 
 export async function updateTransactionAction(id: string, formData: FormData) {
@@ -50,8 +50,8 @@ export async function updateTransactionAction(id: string, formData: FormData) {
     }
     
     await updateTransaction(app.firestore, app.auth.currentUser.uid, id, validatedFields.data);
-    revalidatePath('/dashboard/transactions');
-    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/transactions', 'layout');
+    revalidatePath('/dashboard', 'layout');
 }
 
 export async function deleteTransactionAction(id: string) {
@@ -59,8 +59,8 @@ export async function deleteTransactionAction(id: string) {
     if (!app || !app.auth.currentUser) throw new Error("User not authenticated");
 
     await deleteTransaction(app.firestore, app.auth.currentUser.uid, id);
-    revalidatePath('/dashboard/transactions');
-    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/transactions', 'layout');
+    revalidatePath('/dashboard', 'layout');
 }
 
 export async function updateProfileAction(data: { displayName: string }) {
