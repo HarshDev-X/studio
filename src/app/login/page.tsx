@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -23,6 +24,8 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from 'firebase/auth';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PhoneAuthForm from '@/components/phone-auth-form';
 
 export default function LoginPage() {
   const { auth, user, isUserLoading } = useFirebase();
@@ -50,7 +53,7 @@ export default function LoginPage() {
         rememberMe ? browserLocalPersistence : browserSessionPersistence
       );
       // Non-blocking call
-      initiateEmailSignIn(auth, email, password); 
+      initiateEmailSignIn(auth, email, password);
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -80,49 +83,60 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl font-headline">Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Sign in to your account to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              <Input id="password" name="password" type="password" required />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember-me" name="remember-me" />
-              <Label
-                htmlFor="remember-me"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Remember me
-              </Label>
-            </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/">Back to Home</Link>
-            </Button>
-          </form>
+          <Tabs defaultValue="email">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="phone">Phone</TabsTrigger>
+            </TabsList>
+            <TabsContent value="email">
+              <form onSubmit={handleLogin} className="grid gap-4 mt-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <div className="flex items-center">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      href="#"
+                      className="ml-auto inline-block text-sm underline"
+                    >
+                      Forgot your password?
+                    </Link>
+                  </div>
+                  <Input id="password" name="password" type="password" required />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="remember-me" name="remember-me" />
+                  <Label
+                    htmlFor="remember-me"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Remember me
+                  </Label>
+                </div>
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+              </form>
+            </TabsContent>
+            <TabsContent value="phone">
+               <div className="mt-4">
+                <PhoneAuthForm />
+               </div>
+            </TabsContent>
+          </Tabs>
+
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
             <Link href="/signup" className="underline">
