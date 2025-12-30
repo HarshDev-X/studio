@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SidebarProvider,
   Sidebar,
@@ -18,6 +18,8 @@ import { useFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Share2, Star } from 'lucide-react';
+import ShareAppDialog from '@/components/dashboard/share-app-dialog';
+import RateAppDialog from '@/components/dashboard/rate-app-dialog';
 
 export default function DashboardLayout({
   children,
@@ -56,16 +58,20 @@ export default function DashboardLayout({
           <DashboardNav />
         </SidebarContent>
         <SidebarFooter>
-            <div className="flex flex-col gap-2">
-                 <Button variant="ghost" className="justify-start">
-                    <Share2 className="mr-2" />
-                    Share App
-                </Button>
-                <Button variant="ghost" className="justify-start">
-                    <Star className="mr-2" />
-                    Rate App
-                </Button>
-            </div>
+          <div className="flex flex-col gap-2">
+            <ShareAppDialog>
+              <Button variant="ghost" className="justify-start">
+                <Share2 className="mr-2" />
+                Share App
+              </Button>
+            </ShareAppDialog>
+            <RateAppDialog>
+              <Button variant="ghost" className="justify-start">
+                <Star className="mr-2" />
+                Rate App
+              </Button>
+            </RateAppDialog>
+          </div>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
