@@ -19,6 +19,7 @@ import TransactionSummary from "@/components/transactions/transaction-summary";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { collection, query, orderBy, limit } from "firebase/firestore";
+import AddTransaction from "@/components/transactions/add-transaction";
 
 function DashboardData() {
   const { firestore, user } = useFirebase();
@@ -202,6 +203,7 @@ export default function DashboardPage() {
         <h2 className="text-3xl font-headline font-bold tracking-tight">
           Dashboard
         </h2>
+        <AddTransaction />
       </div>
       <Suspense fallback={<DashboardSkeleton />}>
         <DashboardData />
