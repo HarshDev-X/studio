@@ -11,18 +11,32 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useFirebase } from '@/firebase';
+import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { updateProfileAction } from '@/lib/actions';
 import { useEffect, useState } from 'react';
-import { signOut } from 'firebase/auth';
-import { LogOut, Moon, Sun, Laptop, Save, FileText, Shield, Trash2 } from 'lucide-react';
+import { signOut, deleteUser } from 'firebase/auth';
+import { LogOut, Moon, Sun, Laptop, Save, FileText, Shield, Trash2, Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTheme } from 'next-themes';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { collection, query, writeBatch } from 'firebase/firestore';
+import type { Transaction } from '@/lib/types';
+
 
 const profileSchema = z.object({
   displayName: z.string().min(1, 'Name is required'),
@@ -179,10 +193,93 @@ function SpendingTab() {
 }
 
 function DataPrivacyTab() {
-  const { auth } = useFirebase();
+  const { auth, firestore, user } = useFirebase();
+  const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'transactions'));
+  }, [firestore, user]);
+
+  const { data: transactions, isLoading } = useCollection(transactionsQuery);
+
   const handleSignOut = async () => {
     if (auth) {
       await signOut(auth);
+    }
+  };
+
+  const handleExportData = () => {
+    if (!transactions) {
+      toast({
+        variant: 'destructive',
+        title: 'No data to export',
+        description: 'There are no transactions to export.',
+      });
+      return;
+    }
+
+    const headers = ['id', 'type', 'amount', 'category', 'date', 'description'];
+    const csvContent = [
+      headers.join(','),
+      ...transactions.map((t: Transaction) =>
+        [
+          t.id,
+          t.type,
+          t.amount,
+          t.category,
+          t.date,
+          `"${t.description?.replace(/"/g, '""') || ''}"`,
+        ].join(',')
+      ),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'transactions.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast({ title: 'Success', description: 'Your data has been exported.' });
+  };
+  
+  const handleDeleteAccount = async () => {
+    if (!firestore || !user) {
+      toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in.' });
+      return;
+    }
+    setIsDeleting(true);
+
+    try {
+      // 1. Delete all transactions in a batch
+      const transactionsRef = collection(firestore, 'users', user.uid, 'transactions');
+      const batch = writeBatch(firestore);
+      const querySnapshot = await query(transactionsRef).get();
+      querySnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+      
+      // 2. Delete user data from 'users' collection (if it exists)
+      // await deleteDoc(doc(firestore, 'users', user.uid));
+
+      // 3. Delete the user from Firebase Auth
+      await deleteUser(user);
+
+      toast({ title: 'Account Deleted', description: 'Your account and all associated data have been permanently deleted.' });
+      // The onAuthStateChanged listener will handle redirecting the user.
+    } catch (error: any) {
+      console.error("Account deletion failed:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Account Deletion Failed',
+        description: error.message || 'An error occurred. You may need to re-authenticate to delete your account.',
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -196,9 +293,9 @@ function DataPrivacyTab() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full justify-start" disabled>
-              <FileText className="mr-2" />
-              Export My Data
+            <Button variant="outline" className="w-full justify-start" onClick={handleExportData} disabled={isLoading}>
+              {isLoading ? <Loader2 className="mr-2 animate-spin"/> : <FileText className="mr-2" />}
+              {isLoading ? 'Loading data...' : 'Export My Data'}
             </Button>
             <p className="text-sm text-muted-foreground px-1">Download a copy of all your transaction data.</p>
         </CardContent>
@@ -215,10 +312,30 @@ function DataPrivacyTab() {
               <LogOut className="mr-2" />
               Log Out
             </Button>
-            <Button variant="destructive" disabled className="w-full">
-              <Trash2 className="mr-2" />
-             Delete My Account
-            </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="w-full" disabled={isDeleting}>
+                    {isDeleting ? <Loader2 className="mr-2 animate-spin"/> : <Trash2 className="mr-2" />}
+                    {isDeleting ? 'Deleting Account...' : 'Delete My Account'}
+                  </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your
+                    account and remove all of your data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive hover:bg-destructive/90">
+                    Yes, delete my account
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
              <p className="text-sm text-muted-foreground px-1">Warning: This action is permanent and cannot be undone.</p>
           </CardContent>
         </Card>
