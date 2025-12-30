@@ -49,7 +49,8 @@ export default function LoginPage() {
         auth,
         rememberMe ? browserLocalPersistence : browserSessionPersistence
       );
-      initiateEmailSignIn(auth, email, password);
+      // Non-blocking call
+      initiateEmailSignIn(auth, email, password); 
     } catch (error: any) {
       toast({
         variant: 'destructive',

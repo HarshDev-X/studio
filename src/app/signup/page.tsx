@@ -18,10 +18,9 @@ import { useFirebase } from '@/firebase';
 import {
   initiateAnonymousSignIn,
   initiateEmailSignUp,
+  initiateGoogleSignIn,
 } from '@/firebase/non-blocking-login';
 import {
-  GoogleAuthProvider,
-  signInWithPopup,
   updateProfile,
   setPersistence,
   browserLocalPersistence,
@@ -44,10 +43,9 @@ export default function SignupPage() {
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
-    const provider = new GoogleAuthProvider();
     try {
       await setPersistence(auth, browserLocalPersistence); // Always remember Google sign-ins
-      await signInWithPopup(auth, provider);
+      initiateGoogleSignIn(auth); // Non-blocking call
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -61,7 +59,7 @@ export default function SignupPage() {
     if (!auth) return;
     try {
       await setPersistence(auth, browserSessionPersistence); // Guests are session-only
-      initiateAnonymousSignIn(auth);
+      initiateAnonymousSignIn(auth); // Non-blocking call
     } catch (error: any) {
        toast({
         variant: 'destructive',
@@ -87,20 +85,9 @@ export default function SignupPage() {
       );
       const userCredential = await initiateEmailSignUp(auth, email, password);
 
-      // After sign up, Firebase automatically signs the user in if there's no error.
-      // We can get the user from the credential and update the profile.
-      if (userCredential && userCredential.user) {
-        try {
-          await updateProfile(userCredential.user, { displayName: fullName });
-          // Profile updated, now we can safely navigate
-          router.push('/dashboard');
-        } catch (updateError: any) {
-          toast({
-            variant: 'destructive',
-            title: 'Profile Update Failed',
-            description: updateError.message,
-          });
-        }
+      if (userCredential?.user) {
+        await updateProfile(userCredential.user, { displayName: fullName });
+        // The onAuthStateChanged listener in FirebaseProvider will handle the redirect
       }
     } catch (error: any) {
       toast({
