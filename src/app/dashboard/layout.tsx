@@ -17,28 +17,55 @@ import UserNav from '@/components/user-nav';
 import { useFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Share2, Star } from 'lucide-react';
+import { Share2, Star, Loader2 } from 'lucide-react';
 import ShareAppDialog from '@/components/dashboard/share-app-dialog';
 import RateAppDialog from '@/components/dashboard/rate-app-dialog';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isUserLoading } = useFirebase();
+  const { firestore, user, isUserLoading } = useFirebase();
   const router = useRouter();
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.replace('/login');
+    if (isUserLoading) {
+      return; 
     }
-  }, [isUserLoading, user, router]);
+    if (!user) {
+      router.replace('/login');
+      return;
+    }
 
-  if (isUserLoading || !user) {
+    if (firestore) {
+      const checkOnboarding = async () => {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        try {
+          const userDoc = await getDoc(userDocRef);
+          if (!userDoc.exists() || !userDoc.data()?.onboardingCompleted) {
+            router.replace('/onboarding');
+          } else {
+            setIsCheckingOnboarding(false);
+          }
+        } catch (error) {
+          console.error("Failed to check onboarding status:", error);
+          // Potentially handle error, e.g., redirect to an error page
+          setIsCheckingOnboarding(false);
+        }
+      };
+      checkOnboarding();
+    }
+  }, [isUserLoading, user, firestore, router]);
+
+
+  if (isUserLoading || isCheckingOnboarding) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>Loading...</p>
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="ml-4">Loading your dashboard...</p>
       </div>
     );
   }

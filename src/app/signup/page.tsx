@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -39,8 +38,9 @@ export default function SignupPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Redirect authenticated users to onboarding or dashboard
     if (!isUserLoading && user) {
-      router.push('/dashboard');
+      router.push('/onboarding');
     }
   }, [user, isUserLoading, router]);
 
@@ -48,7 +48,7 @@ export default function SignupPage() {
     if (!auth) return;
     try {
       await setPersistence(auth, browserLocalPersistence); // Always remember Google sign-ins
-      initiateGoogleSignIn(auth); // Non-blocking call
+      initiateGoogleSignIn(auth); // Non-blocking call, onAuthStateChanged will redirect
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -62,7 +62,7 @@ export default function SignupPage() {
     if (!auth) return;
     try {
       await setPersistence(auth, browserSessionPersistence); // Guests are session-only
-      initiateAnonymousSignIn(auth); // Non-blocking call
+      initiateAnonymousSignIn(auth); // Non-blocking call, onAuthStateChanged will redirect
     } catch (error: any) {
        toast({
         variant: 'destructive',
@@ -90,7 +90,7 @@ export default function SignupPage() {
 
       if (userCredential?.user) {
         await updateProfile(userCredential.user, { displayName: fullName });
-        // The onAuthStateChanged listener in FirebaseProvider will handle the redirect
+        // The onAuthStateChanged listener will handle the redirect to /onboarding
       }
     } catch (error: any) {
       toast({

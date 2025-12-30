@@ -23,13 +23,26 @@
           "type": "string",
           "description": "Timestamp indicating when the user account was created.",
           "format": "date-time"
+        },
+        "photoURL": {
+            "type": "string",
+            "description": "URL of the user's profile picture."
+        },
+        "ledgerName": {
+            "type": "string",
+            "description": "The name of the user's primary expense ledger."
+        },
+        "onboardingCompleted": {
+            "type": "boolean",
+            "description": "Flag indicating if the user has completed the onboarding process."
         }
       },
       "required": [
         "id",
         "name",
         "email",
-        "createdAt"
+        "createdAt",
+        "onboardingCompleted"
       ]
     },
     "Transaction": {

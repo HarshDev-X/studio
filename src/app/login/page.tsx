@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -34,6 +33,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
+      // User is logged in, redirect to check onboarding status
       router.push('/dashboard');
     }
   }, [user, isUserLoading, router]);
@@ -52,7 +52,7 @@ export default function LoginPage() {
         auth,
         rememberMe ? browserLocalPersistence : browserSessionPersistence
       );
-      // Non-blocking call
+      // Non-blocking call. The useEffect hook will handle redirection.
       initiateEmailSignIn(auth, email, password);
     } catch (error: any) {
       toast({
