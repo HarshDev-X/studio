@@ -7,4 +7,5 @@ export type ImagePlaceholder = {
   imageHint: string;
 };
 
-export const PlaceHolderImages: ImagePlaceholder[] = data.placeholderImages;
+// The JSON file has a root key `placeholderImages` which holds the array
+export const PlaceHolderImages: ImagePlaceholder[] = (data as any).placeholderImages;
