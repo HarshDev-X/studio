@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { useFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { updateProfileAction } from '@/lib/actions';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { LogOut, Moon, Sun, Laptop, Save, FileText, Shield, Trash2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -144,6 +144,9 @@ function AppearanceTab() {
 }
 
 function SpendingTab() {
+  const [budgetMode, setBudgetMode] = useState(false);
+  const [carryOver, setCarryOver] = useState(false);
+  
   return (
      <Card>
         <CardHeader>
@@ -158,7 +161,7 @@ function SpendingTab() {
               <p className="text-sm text-muted-foreground">Enable to set and track monthly budgets for categories.</p>
            </div>
             <div className="flex items-center space-x-2">
-                <Switch id="budget-mode" disabled />
+                <Switch id="budget-mode" checked={budgetMode} onCheckedChange={setBudgetMode} />
                 <Label htmlFor="budget-mode">Enable Budgeting</Label>
             </div>
           <Separator />
@@ -167,8 +170,8 @@ function SpendingTab() {
               <p className="text-sm text-muted-foreground">Carry over unused budget amounts to the next month.</p>
            </div>
            <div className="flex items-center space-x-2">
-                <Switch id="carry-over" disabled />
-                <Label htmlFor="carry-over">Enable Carry-over</Label>
+                <Switch id="carry-over" checked={carryOver} onCheckedChange={setCarryOver} disabled={!budgetMode} />
+                <Label htmlFor="carry-over" className={!budgetMode ? 'text-muted-foreground' : ''}>Enable Carry-over</Label>
             </div>
         </CardContent>
       </Card>
@@ -206,7 +209,7 @@ function DataPrivacyTab() {
             <CardDescription>
               Logout or permanently delete your account.
             </CardDescription>
-          </CardHeader>
+          </Header>
           <CardContent className="space-y-4">
             <Button variant="outline" onClick={handleSignOut} className="w-full">
               <LogOut className="mr-2" />
