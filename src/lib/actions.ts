@@ -5,7 +5,9 @@ import { z } from 'zod';
 import { addTransaction, updateTransaction, deleteTransaction } from './data';
 import { transactionCategories } from './types';
 import { getAuthenticatedAppForUser } from '@/firebase/server-init';
-import { updateProfile } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth, updateProfile } from 'firebase/auth';
+import { initializeFirebase } from '@/firebase';
 
 const transactionSchema = z.object({
     type: z.enum(['income', 'expense']),

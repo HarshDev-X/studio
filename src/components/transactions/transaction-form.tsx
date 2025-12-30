@@ -77,11 +77,12 @@ export default function TransactionForm({ transaction, onFinished }: Transaction
             toast({ title: 'Success', description: 'Transaction added successfully.' });
         }
         onFinished?.();
-    } catch(error) {
+        form.reset();
+    } catch(error: any) {
         toast({
             variant: "destructive",
             title: 'Error',
-            description: `Failed to ${transaction ? 'update' : 'add'} transaction.`,
+            description: error.message || `Failed to ${transaction ? 'update' : 'add'} transaction.`,
         });
     }
   }
@@ -117,7 +118,7 @@ export default function TransactionForm({ transaction, onFinished }: Transaction
             <FormItem>
               <FormLabel>Amount (INR)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="&#8377; 0.00" {...field} />
+                <Input type="number" placeholder="₹ 0.00" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

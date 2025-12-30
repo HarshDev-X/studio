@@ -1,3 +1,4 @@
+'use server';
 import type { Transaction } from "@/lib/types";
 import { 
   collection, 
@@ -12,7 +13,7 @@ export async function addTransaction(
   db: Firestore, 
   userId: string, 
   transaction: Omit<Transaction, "id" | "userId">
-): Promise<Transaction> {
+) {
   const transactionsCol = collection(db, "users", userId, "transactions");
   
   const newTransactionData = {
@@ -31,7 +32,7 @@ export async function updateTransaction(
   userId: string,
   id: string, 
   updates: Partial<Omit<Transaction, 'id' | 'userId'>>
-): Promise<void> {
+) {
   const transactionDoc = doc(db, "users", userId, "transactions", id);
   
   const updateData: any = { ...updates };
@@ -42,7 +43,7 @@ export async function updateTransaction(
   await updateDoc(transactionDoc, updateData);
 }
 
-export async function deleteTransaction(db: Firestore, userId: string, id: string): Promise<void> {
+export async function deleteTransaction(db: Firestore, userId: string, id: string) {
   const transactionDoc = doc(db, "users", userId, "transactions", id);
   await deleteDoc(transactionDoc);
 }
