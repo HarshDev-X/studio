@@ -209,7 +209,7 @@ function DataPrivacyTab() {
             <CardDescription>
               Logout or permanently delete your account.
             </CardDescription>
-          </Header>
+          </CardHeader>
           <CardContent className="space-y-4">
             <Button variant="outline" onClick={handleSignOut} className="w-full">
               <LogOut className="mr-2" />
