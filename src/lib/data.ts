@@ -1,47 +1,24 @@
 import type { Transaction } from "@/lib/types";
 import { 
   collection, 
-  query, 
-  getDocs, 
   addDoc, 
   updateDoc, 
   deleteDoc,
   doc,
-  orderBy
+  Firestore
 } from "firebase/firestore";
-import { getAuthenticatedAppForUser } from "@/firebase/server-init";
 
-async function getFirestoreAndUser() {
-  const { app } = await getAuthenticatedAppForUser();
-  if (!app) throw new Error("User not authenticated");
-
-  const { firestore, auth } = app;
-  const user = auth.currentUser;
-  if (!user) throw new Error("User not authenticated");
-  
-  return { firestore, user };
-}
-
-export async function getTransactions(): Promise<Transaction[]> {
-  const { firestore, user } = await getFirestoreAndUser();
-  const transactionsCol = collection(firestore, "users", user.uid, "transactions");
-  const q = query(transactionsCol, orderBy("date", "desc"));
-  const querySnapshot = await getDocs(q);
-  
-  const transactions: Transaction[] = [];
-  querySnapshot.forEach((doc) => {
-    transactions.push({ id: doc.id, ...doc.data() } as Transaction);
-  });
-  return transactions;
-}
-
-export async function addTransaction(transaction: Omit<Transaction, "id" | "userId">): Promise<Transaction> {
-  const { firestore, user } = await getFirestoreAndUser();
-  const transactionsCol = collection(firestore, "users", user.uid, "transactions");
+export async function addTransaction(
+  db: Firestore, 
+  userId: string, 
+  transaction: Omit<Transaction, "id" | "userId">
+): Promise<Transaction> {
+  const transactionsCol = collection(db, "users", userId, "transactions");
   
   const newTransactionData = {
     ...transaction,
-    userId: user.uid,
+    userId: userId,
+    createdAt: new Date().toISOString(),
     date: new Date(transaction.date).toISOString()
   };
 
@@ -49,32 +26,23 @@ export async function addTransaction(transaction: Omit<Transaction, "id" | "user
   return { id: docRef.id, ...newTransactionData };
 }
 
-export async function updateTransaction(id: string, updates: Partial<Omit<Transaction, 'id' | 'userId'>>): Promise<Transaction> {
-  const { firestore, user } = await getFirestoreAndUser();
-  const transactionDoc = doc(firestore, "users", user.uid, "transactions", id);
+export async function updateTransaction(
+  db: Firestore,
+  userId: string,
+  id: string, 
+  updates: Partial<Omit<Transaction, 'id' | 'userId'>>
+): Promise<void> {
+  const transactionDoc = doc(db, "users", userId, "transactions", id);
   
-  const updateData = { ...updates };
+  const updateData: any = { ...updates };
   if (updates.date) {
     updateData.date = new Date(updates.date).toISOString();
   }
 
   await updateDoc(transactionDoc, updateData);
-
-  const updatedTransaction: Transaction = {
-    id: id,
-    userId: user.uid,
-    type: updates.type!,
-    amount: updates.amount!,
-    category: updates.category!,
-    date: updates.date!,
-    description: updates.description,
-  }
-  return updatedTransaction;
 }
 
-export async function deleteTransaction(id: string): Promise<{ success: boolean }> {
-  const { firestore, user } = await getFirestoreAndUser();
-  const transactionDoc = doc(firestore, "users", user.uid, "transactions", id);
+export async function deleteTransaction(db: Firestore, userId: string, id: string): Promise<void> {
+  const transactionDoc = doc(db, "users", userId, "transactions", id);
   await deleteDoc(transactionDoc);
-  return { success: true };
 }

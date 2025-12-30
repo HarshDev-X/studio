@@ -21,6 +21,9 @@ const profileSchema = z.object({
 
 
 export async function addTransactionAction(formData: FormData) {
+    const { app } = await getAuthenticatedAppForUser();
+    if (!app || !app.auth.currentUser) throw new Error("User not authenticated");
+
     const rawData = Object.fromEntries(formData.entries());
     const validatedFields = transactionSchema.safeParse(rawData);
 
@@ -29,12 +32,15 @@ export async function addTransactionAction(formData: FormData) {
         throw new Error('Invalid transaction data');
     }
 
-    await addTransaction(validatedFields.data);
-    revalidatePath('/dashboard');
+    await addTransaction(app.firestore, app.auth.currentUser.uid, validatedFields.data);
     revalidatePath('/dashboard/transactions');
+    revalidatePath('/dashboard');
 }
 
 export async function updateTransactionAction(id: string, formData: FormData) {
+    const { app } = await getAuthenticatedAppForUser();
+    if (!app || !app.auth.currentUser) throw new Error("User not authenticated");
+    
     const rawData = Object.fromEntries(formData.entries());
     const validatedFields = transactionSchema.safeParse(rawData);
 
@@ -43,15 +49,18 @@ export async function updateTransactionAction(id: string, formData: FormData) {
         throw new Error('Invalid transaction data');
     }
     
-    await updateTransaction(id, validatedFields.data);
-    revalidatePath('/dashboard');
+    await updateTransaction(app.firestore, app.auth.currentUser.uid, id, validatedFields.data);
     revalidatePath('/dashboard/transactions');
+    revalidatePath('/dashboard');
 }
 
 export async function deleteTransactionAction(id: string) {
-    await deleteTransaction(id);
-    revalidatePath('/dashboard');
+    const { app } = await getAuthenticatedAppForUser();
+    if (!app || !app.auth.currentUser) throw new Error("User not authenticated");
+
+    await deleteTransaction(app.firestore, app.auth.currentUser.uid, id);
     revalidatePath('/dashboard/transactions');
+    revalidatePath('/dashboard');
 }
 
 export async function updateProfileAction(data: { displayName: string }) {

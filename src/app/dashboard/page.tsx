@@ -1,4 +1,6 @@
-import { getTransactions } from "@/lib/data";
+'use client';
+
+import { useCollection, useFirebase, useMemoFirebase } from "@/firebase";
 import {
   Card,
   CardContent,
@@ -16,9 +18,28 @@ import OverviewCharts from "@/components/dashboard/overview-charts";
 import TransactionSummary from "@/components/transactions/transaction-summary";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { collection, query, orderBy, limit } from "firebase/firestore";
 
-async function DashboardData() {
-  const transactions = await getTransactions();
+function DashboardData() {
+  const { firestore, user } = useFirebase();
+
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, "users", user.uid, "transactions"), orderBy("date", "desc"));
+  }, [firestore, user]);
+
+  const recentTransactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, "users", user.uid, "transactions"), orderBy("date", "desc"), limit(5));
+  }, [firestore, user]);
+
+  const { data: transactions, isLoading: isLoadingTransactions } = useCollection(transactionsQuery);
+  const { data: recentTransactions, isLoading: isLoadingRecent } = useCollection(recentTransactionsQuery);
+
+
+  if (isLoadingTransactions || isLoadingRecent || !transactions || !recentTransactions) {
+    return <DashboardSkeleton />;
+  }
 
   const totalIncome = transactions
     .filter((t) => t.type === "income")
@@ -96,7 +117,7 @@ async function DashboardData() {
             </div>
           </CardHeader>
           <CardContent>
-            <RecentTransactions transactions={transactions.slice(0, 5)} />
+            <RecentTransactions transactions={recentTransactions} />
           </CardContent>
         </Card>
       </div>
@@ -140,7 +161,23 @@ function DashboardSkeleton() {
         </Card>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-7">
+        <Card className="lg:col-span-4">
+            <CardHeader>
+                <CardTitle className="font-headline">Monthly Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Skeleton className="h-[350px] w-full" />
+            </CardContent>
+        </Card>
+        <Card className="lg:col-span-3">
+            <CardHeader>
+                <CardTitle className="font-headline">Expense by Category</CardTitle>
+            </CardHeader>
+            <CardContent>
+                 <Skeleton className="h-[350px] w-full" />
+            </CardContent>
+        </Card>
+        <Card className="col-span-7">
           <CardHeader>
             <CardTitle>Recent Transactions</CardTitle>
             <CardDescription>

@@ -1,4 +1,5 @@
-import { getTransactions } from "@/lib/data";
+'use client';
+
 import TransactionsTable from "@/components/transactions/transactions-table";
 import {
   Card,
@@ -10,9 +11,24 @@ import {
 import AddTransaction from "@/components/transactions/add-transaction";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCollection, useFirebase, useMemoFirebase } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
 
-async function TransactionsData() {
-  const transactions = await getTransactions();
+
+function TransactionsData() {
+  const { firestore, user } = useFirebase();
+
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, "users", user.uid, "transactions"), orderBy("date", "desc"));
+  }, [firestore, user]);
+
+  const { data: transactions, isLoading } = useCollection(transactionsQuery);
+
+  if (isLoading || !transactions) {
+    return <TransactionsSkeleton />;
+  }
+  
   return <TransactionsTable transactions={transactions} />;
 }
 
@@ -20,7 +36,7 @@ function TransactionsSkeleton() {
   return <Skeleton className="h-96 w-full" />;
 }
 
-export default async function TransactionsPage() {
+export default function TransactionsPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
