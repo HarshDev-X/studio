@@ -9,7 +9,7 @@
     {
       "id": "feature1",
       "description": "Close-up of a mobile phone screen showing an expense tracking app with Indian Rupee symbols.",
-      "imageUrl": "https://images.unsplash.com/photo-1758876201966-a680772a41ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2JpbGUlMjBmaW5hbmNlfGVufDB8fHx8MTc2NzAzMTYwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1758876201966-a680772a41ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2JpbGUlMjBmaW5hbmNlfGVufDB8fHx8fDE3NjcwMzE2MDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "mobile finance"
     },
     {
@@ -20,39 +20,39 @@
     },
     {
       "id": "user-avatar-1",
-      "description": "User avatar of a man",
-      "imageUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtYW4lMjBhdmF0YXJ8ZW58MHx8fHwxNzY2OTk5Nzc2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "man avatar"
+      "description": "Doodle of a person with a blue shirt.",
+      "imageUrl": "https://images.unsplash.com/photo-1632333529369-b5a1909f2c6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkb29kbGUlMjBwb3J0cmFpdHxlbnwwfHx8fDE3MjE4MzY3MTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "doodle portrait"
     },
     {
       "id": "user-avatar-2",
-      "description": "User avatar of a woman",
-      "imageUrl": "https://images.unsplash.com/photo-1643732994192-03856731da2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3b21hbiUyMGF2YXRhcnxlbnwwfHx8fDE3NjcwODAyNDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "woman avatar"
+      "description": "Doodle illustration of a person with glasses.",
+      "imageUrl": "https://images.unsplash.com/photo-1632333528436-a34f7831f67f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxkb29kbGUlMjBwb3J0cmFpdHxlbnwwfHx8fDE3MjE4MzY3MTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "doodle portrait"
     },
     {
       "id": "user-avatar-3",
-      "description": "User avatar of a boy",
-      "imageUrl": "https://images.unsplash.com/photo-1724435811349-32d27f4d5806?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxib3klMjBhdmF0YXJ8ZW58MHx8fHwxNzY3MDg5NjU5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "boy avatar"
+      "description": "Cartoon doodle of a person with a purple background.",
+      "imageUrl": "https://images.unsplash.com/photo-1632333528359-5970425c2e9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkb29kbGUlMjBwb3J0cmFpdHxlbnwwfHx8fDE3MjE4MzY3MTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "doodle portrait"
     },
     {
       "id": "user-avatar-4",
-      "description": "User avatar of a girl",
-      "imageUrl": "https://images.unsplash.com/photo-1701615004837-40d8573b6652?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxnaXJsJTIwYXZhdGFyfGVufDB8fHx8MTc2NzA4OTY2MHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "girl avatar"
+      "description": "Colorful illustration of a face.",
+      "imageUrl": "https://images.unsplash.com/photo-1632333528393-31583d7a78a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxkb29kbGUlMjBwb3J0cmFpdHxlbnwwfHx8fDE3MjE4MzY3MTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "doodle portrait"
     },
     {
       "id": "user-avatar-5",
-      "description": "User avatar of a man with glasses",
-      "imageUrl": "https://images.unsplash.com/photo-1599566150163-29194dcaad36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYW4lMjBhdmF0YXJ8ZW58MHx8fHwxNzY2OTk5Nzc2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "man avatar"
+      "description": "Line art doodle of a person's face.",
+      "imageUrl": "https://images.unsplash.com/photo-1632333528373-456775d759a7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxkb29kbGUlMjBwb3J0cmFpdHxlbnwwfHx8fDE3MjE4MzY3MTh8MA&ixlibrb-4.1.0&q=80&w=1080",
+      "imageHint": "doodle portrait"
     },
     {
       "id": "user-avatar-6",
-      "description": "User avatar of a woman with short hair",
-      "imageUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b21hbiUyMGF2YXRhcnxlbnwwfHx8fDE3NjcwODAyNDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "woman avatar"
+      "description": "Abstract doodle of a person's face.",
+      "imageUrl": "https://images.unsplash.com/photo-1632333528335-9b9c833d7d7c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkb29kbGUlMjBwb3J0cmFpdHxlbnwwfHx8fDE3MjE4MzY3MTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "doodle portrait"
     }
   ]
 }
