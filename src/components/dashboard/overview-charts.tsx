@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import type { Transaction } from '@/lib/types';
 import { transactionCategories } from '@/lib/types';
 import { useMemo } from 'react';
+import { format } from 'date-fns';
 
 interface OverviewChartsProps {
   transactions: Transaction[];
@@ -27,7 +28,7 @@ export default function OverviewCharts({ transactions }: OverviewChartsProps) {
     const monthlyOverview = useMemo(() => {
         const data: { [key: string]: { income: number; expense: number } } = {};
         transactions.forEach(t => {
-            const month = new Date(t.date).toLocaleString('default', { month: 'short', year: '2-digit' });
+            const month = format(new Date(t.date), 'MMM yy');
             if (!data[month]) {
                 data[month] = { income: 0, expense: 0 };
             }
@@ -37,8 +38,12 @@ export default function OverviewCharts({ transactions }: OverviewChartsProps) {
                 data[month].expense += t.amount;
             }
         });
+        
+        const sortedData = Object.entries(data)
+            .map(([name, values]) => ({ name, ...values }))
+            .sort((a, b) => new Date(`01 ${a.name}`).getTime() - new Date(`01 ${b.name}`).getTime());
 
-        return Object.entries(data).map(([name, values]) => ({ name, ...values })).reverse();
+        return sortedData;
     }, [transactions]);
     
     const categoryExpenses = useMemo(() => {
@@ -59,8 +64,8 @@ export default function OverviewCharts({ transactions }: OverviewChartsProps) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
             <CardHeader>
-                <CardTitle className="font-headline">Monthly Overview</CardTitle>
-                <CardDescription>A bar chart showing your income and expenses over the last few months.</CardDescription>
+                <CardTitle className="font-headline">Overview</CardTitle>
+                <CardDescription>A bar chart showing your income and expenses.</CardDescription>
             </CardHeader>
             <CardContent className="pl-2">
                 <ResponsiveContainer width="100%" height={350}>
