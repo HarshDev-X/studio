@@ -1,7 +1,7 @@
 
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import {
   Auth,
   RecaptchaVerifier,
@@ -30,15 +30,29 @@ export default function PhoneAuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
 
-  const setupRecaptcha = (authInstance: Auth) => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(authInstance, 'recaptcha-container', {
-        size: 'invisible',
-        callback: () => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-        },
-      });
+  // This effect ensures the reCAPTCHA container is ready.
+  useEffect(() => {
+    if (!isOtpSent && !document.getElementById('recaptcha-container-div')) {
+      const container = document.createElement('div');
+      container.id = 'recaptcha-container-div';
+      document.getElementById('recaptcha-container-parent')?.appendChild(container);
     }
+  }, [isOtpSent]);
+
+  const setupRecaptcha = (authInstance: Auth) => {
+    // Ensure the container is clean before creating a new verifier
+    const recaptchaContainer = document.getElementById('recaptcha-container-div');
+    if (recaptchaContainer) {
+      recaptchaContainer.innerHTML = '';
+    }
+
+    // Always create a new verifier instance on each attempt
+    window.recaptchaVerifier = new RecaptchaVerifier(authInstance, 'recaptcha-container-div', {
+      size: 'invisible',
+      callback: () => {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+      },
+    });
   };
 
   const handleSendOtp = async (event: FormEvent) => {
@@ -48,6 +62,7 @@ export default function PhoneAuthForm() {
       return;
     }
     setIsLoading(true);
+
     try {
       setupRecaptcha(auth);
       const appVerifier = window.recaptchaVerifier!;
@@ -60,12 +75,7 @@ export default function PhoneAuthForm() {
       toast({
         variant: 'destructive',
         title: 'Failed to send OTP',
-        description: error.message || 'Please try again.',
-      });
-      // Reset reCAPTCHA so user can try again
-      window.recaptchaVerifier?.render().then((widgetId) => {
-        // @ts-ignore
-        grecaptcha.reset(widgetId);
+        description: error.message || 'Please check your browser console for details.',
       });
     } finally {
       setIsLoading(false);
@@ -96,7 +106,7 @@ export default function PhoneAuthForm() {
 
   return (
     <div className="grid gap-4">
-      <div id="recaptcha-container"></div>
+      <div id="recaptcha-container-parent"></div>
       {!isOtpSent ? (
         <form onSubmit={handleSendOtp} className="grid gap-4">
           <div className="grid gap-2">
