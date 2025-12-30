@@ -60,6 +60,8 @@ export function DateRangePicker({
             selected={date}
             onSelect={onDateChange}
             numberOfMonths={2}
+            fromDate={new Date('2020-01-01')}
+            toDate={new Date('2099-12-31')}
           />
         </PopoverContent>
       </Popover>

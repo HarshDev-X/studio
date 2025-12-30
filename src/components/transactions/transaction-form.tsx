@@ -188,6 +188,8 @@ export default function TransactionForm({ transaction, onFinished }: Transaction
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
+                    fromDate={new Date('2020-01-01')}
+                    toDate={new Date('2099-12-31')}
                     disabled={(date) =>
                       date > new Date() || date < new Date('1900-01-01')
                     }
