@@ -2,7 +2,7 @@
 import type { Transaction } from "@/lib/types";
 import { 
   collection, 
-  addDoc, 
+  setDoc,
   updateDoc, 
   deleteDoc,
   doc,
@@ -16,16 +16,20 @@ export async function addTransaction(
   transaction: Omit<Transaction, "id" | "userId" | "createdAt">
 ) {
   const transactionsCol = collection(db, "users", userId, "transactions");
+  // Create a new document reference with a unique ID
+  const newTransactionRef = doc(transactionsCol);
   
   const newTransactionData = {
     ...transaction,
+    id: newTransactionRef.id, // Add the document's ID to the data
     userId: userId,
     createdAt: serverTimestamp(),
     date: new Date(transaction.date).toISOString()
   };
 
-  const docRef = await addDoc(transactionsCol, newTransactionData);
-  return { id: docRef.id, ...newTransactionData };
+  // Set the document with the new data
+  await setDoc(newTransactionRef, newTransactionData);
+  return { id: newTransactionRef.id, ...newTransactionData };
 }
 
 export async function updateTransaction(
