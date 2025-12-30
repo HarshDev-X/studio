@@ -1,16 +1,11 @@
 'use server';
 
-// This file is a core part of your application's BACKEND.
-// It contains "Server Actions", which are secure, server-side functions
-// that you can call directly from your frontend components.
-// This is a modern approach to building web apps with Next.js.
-
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { addTransaction, updateTransaction, deleteTransaction } from './data';
 import { transactionCategories } from './types';
-import { getAuth, updateProfile } from 'firebase/auth';
-import { initializeFirebase } from '@/firebase/index';
+import { getAuthenticatedAppForUser } from '@/firebase/server-init';
+import { updateProfile } from 'firebase/auth';
 
 const transactionSchema = z.object({
     type: z.enum(['income', 'expense']),
@@ -60,9 +55,12 @@ export async function deleteTransactionAction(id: string) {
 }
 
 export async function updateProfileAction(data: { displayName: string }) {
-  const { auth } = initializeFirebase();
-  const currentUser = auth.currentUser;
+  const { app } = await getAuthenticatedAppForUser();
+  if (!app) {
+    throw new Error('You must be logged in to update your profile.');
+  }
 
+  const currentUser = app.auth.currentUser;
   if (!currentUser) {
     throw new Error('You must be logged in to update your profile.');
   }

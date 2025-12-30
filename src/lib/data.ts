@@ -1,12 +1,7 @@
-// This file is a core part of your application's BACKEND.
-// It contains the data access logic that communicates with your database (Firestore).
-// These functions run on the server to securely fetch and modify your app's data.
-
 import type { Transaction } from "@/lib/types";
 import { 
   collection, 
   query, 
-  where, 
   getDocs, 
   addDoc, 
   updateDoc, 
@@ -14,14 +9,16 @@ import {
   doc,
   orderBy
 } from "firebase/firestore";
-import { initializeFirebase } from "@/firebase";
-
-// This file will now interact with Firestore
+import { getAuthenticatedAppForUser } from "@/firebase/server-init";
 
 async function getFirestoreAndUser() {
-  const { firestore, auth } = initializeFirebase();
+  const { app } = await getAuthenticatedAppForUser();
+  if (!app) throw new Error("User not authenticated");
+
+  const { firestore, auth } = app;
   const user = auth.currentUser;
   if (!user) throw new Error("User not authenticated");
+  
   return { firestore, user };
 }
 
