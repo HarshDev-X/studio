@@ -28,8 +28,17 @@ export default function TransactionSummary({ transactions }: TransactionSummaryP
   const handleGenerateSummary = async () => {
     setIsLoading(true);
     setSummary(null);
+    
+    // Convert transactions to a plain, serializable format
+    const serializableTransactions = transactions.map(t => ({
+      ...t,
+      // Ensure date is a string, which it should be based on Transaction type.
+      date: typeof t.date === 'string' ? t.date : new Date(t.date).toISOString().split('T')[0],
+      // Convert any other complex objects if necessary, though the schema seems simple.
+    }));
+    
     try {
-      const result = await summarizeTransactions({ transactions });
+      const result = await summarizeTransactions({ transactions: serializableTransactions });
       setSummary(result);
     } catch (error) {
       console.error('Failed to generate summary:', error);
@@ -46,12 +55,17 @@ export default function TransactionSummary({ transactions }: TransactionSummaryP
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={handleGenerateSummary}>
+        <Button variant="outline" onClick={() => setOpen(true)}>
           <Sparkles className="mr-2 h-4 w-4" />
           Get AI Summary
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" onOpenAutoFocus={(e) => {
+          if (!summary && !isLoading) {
+            handleGenerateSummary();
+          }
+          e.preventDefault();
+      }}>
         <DialogHeader>
           <DialogTitle>AI Spending Summary</DialogTitle>
           <DialogDescription>
