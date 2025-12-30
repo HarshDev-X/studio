@@ -1,4 +1,4 @@
-'use server';
+'use client';
 import type { Transaction } from "@/lib/types";
 import { 
   collection, 
@@ -6,20 +6,21 @@ import {
   updateDoc, 
   deleteDoc,
   doc,
-  Firestore
+  Firestore,
+  serverTimestamp
 } from "firebase/firestore";
 
 export async function addTransaction(
   db: Firestore, 
   userId: string, 
-  transaction: Omit<Transaction, "id" | "userId">
+  transaction: Omit<Transaction, "id" | "userId" | "createdAt">
 ) {
   const transactionsCol = collection(db, "users", userId, "transactions");
   
   const newTransactionData = {
     ...transaction,
     userId: userId,
-    createdAt: new Date().toISOString(),
+    createdAt: serverTimestamp(),
     date: new Date(transaction.date).toISOString()
   };
 

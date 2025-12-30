@@ -34,9 +34,11 @@ import { Transaction } from '@/lib/types';
 import { MoreHorizontal, ArrowUpDown, Trash, Edit } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { deleteTransactionAction } from '@/lib/actions';
+import { revalidateTransactionsAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import EditTransaction from './edit-transaction';
+import { useFirebase } from '@/firebase';
+import { deleteTransaction } from '@/lib/data';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -47,6 +49,7 @@ export default function TransactionsTable({ transactions }: TransactionsTablePro
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const { toast } = useToast();
+  const { firestore, user } = useFirebase();
 
   const columns: ColumnDef<Transaction>[] = [
     {
@@ -110,8 +113,17 @@ export default function TransactionsTable({ transactions }: TransactionsTablePro
         const transaction = row.original;
 
         const handleDelete = async () => {
+            if (!firestore || !user) {
+                 toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "You must be logged in to delete a transaction.",
+                });
+                return;
+            }
             try {
-                await deleteTransactionAction(transaction.id);
+                await deleteTransaction(firestore, user.uid, transaction.id);
+                await revalidateTransactionsAction();
                 toast({
                     title: "Success",
                     description: "Transaction deleted successfully.",

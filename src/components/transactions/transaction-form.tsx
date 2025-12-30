@@ -25,10 +25,12 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { addTransactionAction, updateTransactionAction } from '@/lib/actions';
+import { revalidateTransactionsAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Transaction, transactionCategories } from '@/lib/types';
 import { Textarea } from '../ui/textarea';
+import { useFirebase } from '@/firebase';
+import { addTransaction, updateTransaction } from '@/lib/data';
 
 const formSchema = z.object({
   type: z.enum(['income', 'expense']),
@@ -45,6 +47,8 @@ type TransactionFormProps = {
 
 export default function TransactionForm({ transaction, onFinished }: TransactionFormProps) {
   const { toast } = useToast();
+  const { firestore, user } = useFirebase();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: transaction ? {
@@ -61,21 +65,29 @@ export default function TransactionForm({ transaction, onFinished }: Transaction
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const formData = new FormData();
-    formData.append('type', values.type);
-    formData.append('amount', values.amount.toString());
-    formData.append('category', values.category);
-    formData.append('date', values.date.toISOString());
-    formData.append('description', values.description || '');
+    if (!firestore || !user) {
+        toast({
+            variant: "destructive",
+            title: 'Error',
+            description: 'You must be logged in to perform this action.',
+        });
+        return;
+    }
+
+    const transactionData = {
+        ...values,
+        date: values.date.toISOString(),
+    };
 
     try {
         if (transaction) {
-            await updateTransactionAction(transaction.id, formData);
+            await updateTransaction(firestore, user.uid, transaction.id, transactionData);
             toast({ title: 'Success', description: 'Transaction updated successfully.' });
         } else {
-            await addTransactionAction(formData);
+            await addTransaction(firestore, user.uid, transactionData);
             toast({ title: 'Success', description: 'Transaction added successfully.' });
         }
+        await revalidateTransactionsAction();
         onFinished?.();
         form.reset();
     } catch(error: any) {
