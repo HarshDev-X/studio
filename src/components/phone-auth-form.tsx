@@ -40,17 +40,27 @@ export default function PhoneAuthForm() {
   }, [isOtpSent]);
 
   const setupRecaptcha = (authInstance: Auth) => {
-    // Ensure the container is clean before creating a new verifier
+    // 1. Clear existing window instance if it already exists
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (e) {
+        console.error('Error clearing recaptcha:', e);
+      }
+      window.recaptchaVerifier = undefined;
+    }
+
+    // 2. Clean up DOM container
     const recaptchaContainer = document.getElementById('recaptcha-container-div');
     if (recaptchaContainer) {
       recaptchaContainer.innerHTML = '';
     }
 
-    // Always create a new verifier instance on each attempt
+    // 3. Create fresh RecaptchaVerifier instance
     window.recaptchaVerifier = new RecaptchaVerifier(authInstance, 'recaptcha-container-div', {
       size: 'invisible',
       callback: () => {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        // reCAPTCHA solved
       },
     });
   };
@@ -72,6 +82,15 @@ export default function PhoneAuthForm() {
       toast({ title: 'OTP Sent', description: 'Please check your phone for the code.' });
     } catch (error: any) {
       console.error('SMS not sent', error);
+
+      // Clean up reCAPTCHA on failure so user can try again
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {}
+        window.recaptchaVerifier = undefined;
+      }
+
       toast({
         variant: 'destructive',
         title: 'Failed to send OTP',
