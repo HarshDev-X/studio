@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
-import { useFirebase } from '@/lib/firebase';
-import { initiatedEmailSignIn } from '@/lib/firebase/non-blocking-login';
+import { useFirebase } from '@/firebase';
+import { initiatedEmailSignIn } from '@/firebase/non-blocking-login';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
