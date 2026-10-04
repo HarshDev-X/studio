@@ -27,9 +27,24 @@ export default function UserNav() {
   const router = useRouter();
   const avatarImage = PlaceHolderImages.find((p) => p.id === 'user-avatar-1');
 
-  const handleSignOut = async () => {
-    if (auth) {
-      await firebaseSignOut(auth);
+ const handleSignOut = async () => {
+    try {
+      // 1. Local Phone verification flags remove karein
+      localStorage.removeItem('user_verified');
+      localStorage.removeItem('user_phone');
+      localStorage.clear();
+
+      // 2. Firebase sign out
+      if (auth) {
+        await firebaseSignOut(auth);
+      }
+
+      // 3. Direct clean redirect to login page
+      window.location.replace('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      localStorage.clear();
+      window.location.replace('/login');
     }
   };
 
