@@ -32,85 +32,74 @@ export default function DashboardLayout({
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
 
   useEffect(() => {
-    if (isUserLoading) {
-      return; 
-    }
-    if (!user) {
+    const isPhoneVerified = localStorage.getItem('user_verified') === 'true';
+
+    if (isUserLoading) return;
+
+    if (!user && !isPhoneVerified) {
       router.replace('/login');
       return;
     }
 
-    if (firestore) {
+    if (firestore && user) {
       const checkOnboarding = async () => {
         const userDocRef = doc(firestore, 'users', user.uid);
         try {
           const userDoc = await getDoc(userDocRef);
-          if (!userDoc.exists() || !userDoc.data()?.onboardingCompleted) {
+          if (userDoc.exists() && !userDoc.data()?.onboardingCompleted) {
             router.replace('/onboarding');
           } else {
             setIsCheckingOnboarding(false);
           }
-        } catch (error) {
-          console.error("Failed to check onboarding status:", error);
-          // Potentially handle error, e.g., redirect to an error page
+        } catch (e) {
           setIsCheckingOnboarding(false);
         }
       };
       checkOnboarding();
+    } else {
+      setIsCheckingOnboarding(false);
     }
-  }, [isUserLoading, user, firestore, router]);
-
+  }, [user, isUserLoading, firestore, router]);
 
   if (isUserLoading || isCheckingOnboarding) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <p className="ml-4">Loading your dashboard...</p>
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading your dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Logo />
-            <h1 className="text-xl font-headline font-bold text-primary">
-              VERMA & CO.
-            </h1>
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <DashboardNav />
-        </SidebarContent>
-        <SidebarFooter>
-          <div className="flex flex-col gap-2">
-            <ShareAppDialog>
-              <Button variant="ghost" className="justify-start">
-                <Share2 className="mr-2" />
-                Share App
-              </Button>
-            </ShareAppDialog>
-            <RateAppDialog>
-              <Button variant="ghost" className="justify-start">
-                <Star className="mr-2" />
-                Rate App
-              </Button>
-            </RateAppDialog>
-          </div>
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
-          <SidebarTrigger className="md:hidden" />
-          <div className="w-full flex-1">
-            {/* Can add breadcrumbs or search here */}
-          </div>
-          <UserNav />
-        </header>
-        <main>{children}</main>
-      </SidebarInset>
+    <SidebarProvider defaultOpen>
+      <div className="flex min-h-screen w-full">
+        <Sidebar className="border-r">
+          <SidebarHeader className="border-b px-6 py-4">
+            <div className="flex items-center gap-2">
+              <Logo />
+              <span className="font-headline text-lg font-bold">VERMA & CO.</span>
+            </div>
+          </SidebarHeader>
+          <SidebarContent className="p-4">
+            <DashboardNav />
+          </SidebarContent>
+          <SidebarFooter className="border-t p-4">
+            <UserNav />
+          </SidebarFooter>
+        </Sidebar>
+        <SidebarInset className="flex flex-1 flex-col">
+          <header className="flex h-16 items-center justify-between border-b px-6">
+            <SidebarTrigger />
+            <div className="flex items-center gap-2">
+              <ShareAppDialog />
+              <RateAppDialog />
+            </div>
+          </header>
+          <main className="flex-1 p-6">{children}</main>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }
