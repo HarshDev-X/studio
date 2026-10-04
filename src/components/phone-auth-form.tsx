@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +9,6 @@ import { Loader2 } from 'lucide-react';
 
 export default function PhoneAuthForm() {
   const { toast } = useToast();
-  const router = useRouter();
 
   const [phoneNumber, setPhoneNumber] = useState('+91');
   const [otp, setOtp] = useState('');
@@ -18,7 +16,7 @@ export default function PhoneAuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
 
-  // 1. Send OTP via Fast2SMS
+  // 1. Send OTP via API
   const handleSendOtp = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
@@ -42,7 +40,7 @@ export default function PhoneAuthForm() {
         setIsOtpSent(true);
         toast({
           title: 'OTP Sent!',
-          description: 'Please check your phone for the 6-digit verification code.',
+          description: 'Please check your phone for the verification code.',
         });
       } else {
         toast({
@@ -62,32 +60,31 @@ export default function PhoneAuthForm() {
     }
   };
 
-  // 2. Verify OTP & Grant Access Direct
+  // 2. Verify OTP & Direct Redirect
   const handleVerifyOtp = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
     if (otp.trim() === generatedOtp) {
-      // Store dummy session marker in localStorage/Cookie for client side
+      // Session local storage mein set karein
       localStorage.setItem('user_verified', 'true');
-      localStorage.setItem('phone', phoneNumber);
+      localStorage.setItem('user_phone', phoneNumber);
 
       toast({
         title: 'Success!',
-        description: 'Phone number verified! Redirecting...',
+        description: 'Redirecting to dashboard...',
       });
 
-      // Redirect directly to dashboard without secondary login requirement
-      router.push('/dashboard');
+      // Hard redirect to dashboard
+      window.location.replace('/dashboard');
     } else {
       toast({
         variant: 'destructive',
         title: 'Invalid OTP',
         description: 'The code you entered is incorrect. Please try again.',
       });
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -128,7 +125,7 @@ export default function PhoneAuthForm() {
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Verify OTP & Sign In
+            Verify OTP & Login
           </Button>
           <Button
             type="button"
