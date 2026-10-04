@@ -60,7 +60,7 @@ export default function PhoneAuthForm() {
     }
   };
 
-  // 2. Verify OTP & Direct Redirect
+  // 2. Verify OTP & Direct Navigation to Dashboard
   const handleVerifyOtp = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
@@ -75,8 +75,8 @@ export default function PhoneAuthForm() {
         description: 'Redirecting to dashboard...',
       });
 
-      // Hard redirect to dashboard
-      window.location.replace('/dashboard');
+      // Direct hard redirect to dashboard
+      window.location.href = '/dashboard';
     } else {
       toast({
         variant: 'destructive',
