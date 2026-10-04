@@ -22,13 +22,15 @@ export default function LoginPage() {
   const { auth, user, isUserLoading } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('email');
 
   useEffect(() => {
-    if (!isUserLoading && user) {
-      router.push('/dashboard');
+    const isPhoneVerified = localStorage.getItem('user_verified') === 'true';
+
+    // Agar Firebase auth verified hai ya Phone OTP verified hai toh direct dashboard jayein
+    if ((!isUserLoading && user) || isPhoneVerified) {
+      window.location.replace('/dashboard');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading]);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,7 +71,7 @@ export default function LoginPage() {
             Sign in to your account to continue
           </p>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs defaultValue="email" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="phone">Phone</TabsTrigger>
