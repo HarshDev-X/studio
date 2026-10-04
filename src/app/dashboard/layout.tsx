@@ -36,8 +36,9 @@ export default function DashboardLayout({
 
     if (isUserLoading) return;
 
+    // Agar User logged out hai -> Immediate hard redirect
     if (!user && !isPhoneVerified) {
-      router.replace('/login');
+      window.location.replace('/login');
       return;
     }
 
@@ -61,7 +62,9 @@ export default function DashboardLayout({
     }
   }, [user, isUserLoading, firestore, router]);
 
-  if (isUserLoading || isCheckingOnboarding) {
+  const isPhoneVerified = typeof window !== 'undefined' && localStorage.getItem('user_verified') === 'true';
+
+if (isUserLoading || (isCheckingOnboarding && (user || isPhoneVerified))) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">
