@@ -1,21 +1,13 @@
 'use client';
 
-import Link from 'next/link';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
-import { useFirebase } from '@/firebase';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
-import { FormEvent, useEffect } from 'react';
+import { useFirebase } from '@/g/firebase';
+import { initiatedEmailSignIn } from '@/g/firebase/non-blocking-login';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -29,12 +21,10 @@ import PhoneAuthForm from '@/components/phone-auth-form';
 export default function LoginPage() {
   const { auth, user, isUserLoading } = useFirebase();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('email');
   const { toast } = useToast();
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      // User is logged in, redirect to check onboarding status
       router.push('/dashboard');
     }
   }, [user, isUserLoading, router]);
@@ -53,8 +43,7 @@ export default function LoginPage() {
         auth,
         rememberMe ? browserLocalPersistence : browserSessionPersistence
       );
-      // Non-blocking call. The useEffect hook will handle redirection.
-      initiateEmailSignIn(auth, email, password);
+      initiatedEmailSignIn(auth, email, password);
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -64,88 +53,55 @@ export default function LoginPage() {
     }
   };
 
-  if (isUserLoading || user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary/50 p-4">
-      <Card className="mx-auto max-w-sm w-full">
-        <CardHeader className="text-center">
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <Logo />
-            <h1 className="text-2xl font-headline font-bold text-primary">
-              VERMA & CO.
-            </h1>
-          </div>
-          <CardTitle className="text-2xl font-headline">Login</CardTitle>
-          <CardDescription>
+      <div className="mx-auto max-w-sm w-full">
+        <div className="text-center mb-4 flex justify-center items-center gap-2">
+          <Logo />
+          <h1 className="text-2xl font-headline font-bold text-primary">
+            VERMA & CO.
+          </h1>
+        </div>
+        <div className="bg-card p-6 rounded-lg shadow-md border">
+          <h2 className="text-2xl font-headline font-bold text-center">Login</h2>
+          <p className="text-sm text-muted-foreground text-center mb-4">
             Sign in to your account to continue
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          </p>
+
+          <Tabs defaultValue="email" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="phone">Phone</TabsTrigger>
             </TabsList>
+
             <TabsContent value="email">
               <form onSubmit={handleLogin} className="grid gap-4 mt-4">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                  />
+                  <Input id="email" name="email" type="email" placeholder="m@example.com" required />
                 </div>
                 <div className="grid gap-2">
-                  <div className="flex items-center">
+                  <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="#"
-                      className="ml-auto inline-block text-sm underline"
-                    >
-                      Forgot your password?
-                    </Link>
                   </div>
                   <Input id="password" name="password" type="password" required />
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox id="remember-me" name="remember-me" />
-                  <Label
-                    htmlFor="remember-me"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Remember me
-                  </Label>
+                  <Label htmlFor="remember-me" className="text-sm font-medium">Remember me</Label>
                 </div>
-                <Button type="submit" className="w-full">
-                  Login
-                </Button>
+                <Button type="submit" className="w-full">Login</Button>
               </form>
             </TabsContent>
+
             <TabsContent value="phone">
-               <div className="mt-4">
-                <PhoneAuthForm onSuccess={() => { window.location.href = '/dashboard'; }} />
-               </div>
+              <div className="mt-4">
+                <PhoneAuthForm />
+              </div>
             </TabsContent>
           </Tabs>
-
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="underline">
-              Sign up
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
