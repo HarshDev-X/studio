@@ -6,8 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { signInAnonymously } from 'firebase/auth';
+import { useFirebase } from '@/firebase';
 
 export default function PhoneAuthForm() {
+  const { auth } = useFirebase();
   const { toast } = useToast();
 
   const [phoneNumber, setPhoneNumber] = useState('+91');
@@ -60,23 +63,31 @@ export default function PhoneAuthForm() {
     }
   };
 
-  // 2. Verify OTP & Direct Navigation to Dashboard
+  // 2. Verify OTP & Anonymous Firebase Login
   const handleVerifyOtp = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
     if (otp.trim() === generatedOtp) {
-      // Session local storage mein set karein
-      localStorage.setItem('user_verified', 'true');
-      localStorage.setItem('user_phone', phoneNumber);
+      try {
+        if (auth) {
+          await signInAnonymously(auth);
+        }
 
-      toast({
-        title: 'Success!',
-        description: 'Redirecting to dashboard...',
-      });
+        localStorage.setItem('user_verified', 'true');
+        localStorage.setItem('user_phone', phoneNumber);
 
-      // Direct hard redirect to dashboard
-      window.location.href = '/dashboard';
+        toast({
+          title: 'Success!',
+          description: 'Redirecting to dashboard...',
+        });
+
+        window.location.href = '/dashboard';
+      } catch (err: any) {
+        localStorage.setItem('user_verified', 'true');
+        localStorage.setItem('user_phone', phoneNumber);
+        window.location.href = '/dashboard';
+      }
     } else {
       toast({
         variant: 'destructive',
