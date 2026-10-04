@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 
 export default function PhoneAuthForm() {
   const { toast } = useToast();
-  const router = Router();
+  const router = useRouter();
 
   const [phoneNumber, setPhoneNumber] = useState('+91');
   const [otp, setOtp] = useState('');
