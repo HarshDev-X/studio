@@ -29,6 +29,7 @@ import PhoneAuthForm from '@/components/phone-auth-form';
 export default function LoginPage() {
   const { auth, user, isUserLoading } = useFirebase();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState('email');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -87,7 +88,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="email">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="phone">Phone</TabsTrigger>
@@ -132,7 +133,7 @@ export default function LoginPage() {
             </TabsContent>
             <TabsContent value="phone">
                <div className="mt-4">
-                <PhoneAuthForm />
+                <PhoneAuthForm onSuccess={() => { window.location.href = '/dashboard'; }} />
                </div>
             </TabsContent>
           </Tabs>
