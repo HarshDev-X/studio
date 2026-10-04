@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { useFirebase } from '@/firebase';
-import { initiatedEmailSignIn } from '@/firebase/non-blocking-login';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  setPersistence,
-  browserLocalPersistence,
+import { 
+  setPersistence, 
+  browserLocalPersistence, 
   browserSessionPersistence,
+  signInWithEmailAndPassword
 } from 'firebase/auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PhoneAuthForm from '@/components/phone-auth-form';
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const { auth, user, isUserLoading } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const isPhoneVerified = localStorage.getItem('user_verified') === 'true';
@@ -36,23 +37,38 @@ export default function LoginPage() {
     event.preventDefault();
     if (!auth) return;
 
+    setLoading(true);
     const formData = new FormData(event.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const rememberMe = formData.get('remember-me') === 'on';
 
     try {
+      // 1. Session Persistence Setup (Purana Logic Intact)
       await setPersistence(
         auth,
         rememberMe ? browserLocalPersistence : browserSessionPersistence
       );
-      initiatedEmailSignIn(auth, email, password);
+
+      // 2. Real Official Firebase Sign In (Fixes 'not a function' error)
+      await signInWithEmailAndPassword(auth, email, password);
+
+      toast({
+        title: 'Login Successful',
+        description: 'Redirecting to dashboard...',
+      });
+
+      // Clear local phone flag on real email login
+      localStorage.removeItem('user_verified');
+      window.location.replace('/dashboard');
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: error.message,
+        description: error.message?.replace('Firebase: ', '') || 'Invalid credentials',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,19 +97,34 @@ export default function LoginPage() {
               <form onSubmit={handleLogin} className="grid gap-4 mt-4">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+                  <Input 
+                    id="email" 
+                    name="email" 
+                    type="email" 
+                    placeholder="m@example.com" 
+                    required 
+                  />
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
                   </div>
-                  <Input id="password" name="password" type="password" required />
+                  <Input 
+                    id="password" 
+                    name="password" 
+                    type="password" 
+                    required 
+                  />
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox id="remember-me" name="remember-me" />
-                  <Label htmlFor="remember-me" className="text-sm font-medium">Remember me</Label>
+                  <Label htmlFor="remember-me" className="text-sm font-medium leading-none">
+                    Remember me
+                  </Label>
                 </div>
-                <Button type="submit" className="w-full">Login</Button>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Logging in...' : 'Login'}
+                </Button>
               </form>
             </TabsContent>
 
