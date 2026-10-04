@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
-import { useFirebase } from '@/g/firebase';
-import { initiatedEmailSignIn } from '@/g/firebase/non-blocking-login';
+import { useFirebase } from '@/lib/firebase';
+import { initiatedEmailSignIn } from '@/lib/firebase/non-blocking-login';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const { auth, user, isUserLoading } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('email');
 
   useEffect(() => {
     if (!isUserLoading && user) {
@@ -68,7 +69,7 @@ export default function LoginPage() {
             Sign in to your account to continue
           </p>
 
-          <Tabs defaultValue="email" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="phone">Phone</TabsTrigger>
