@@ -18,12 +18,11 @@ export default function PhoneAuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
 
-  // 1. Fast2SMS API dwara OTP bhejna
+  // 1. Send OTP via Fast2SMS
   const handleSendOtp = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
-    // 6-digit random OTP generate karein
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(newOtp);
 
@@ -63,17 +62,22 @@ export default function PhoneAuthForm() {
     }
   };
 
-  // 2. OTP Verification Local Check
+  // 2. Verify OTP & Grant Access Direct
   const handleVerifyOtp = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
     if (otp.trim() === generatedOtp) {
+      // Store dummy session marker in localStorage/Cookie for client side
+      localStorage.setItem('user_verified', 'true');
+      localStorage.setItem('phone', phoneNumber);
+
       toast({
         title: 'Success!',
-        description: 'Phone number verified successfully.',
+        description: 'Phone number verified! Redirecting...',
       });
-      // Verification successful - redirect to dashboard
+
+      // Redirect directly to dashboard without secondary login requirement
       router.push('/dashboard');
     } else {
       toast({
