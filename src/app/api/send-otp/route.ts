@@ -15,8 +15,9 @@ export async function POST(req: Request) {
     // Clean phone number to 10 digits
     const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
 
-    // Call Fast2SMS Dev/OTP API
-    const fast2smsUrl = `https://www.fast2sms.com/dev/bulkV2?authorization=${apiKey}&route=otp&variables_values=${otp}&numbers=${cleanNumber}`;
+    // Using route=q (Quick Transactional/Dev Route) to bypass website verification restriction
+    const message = `Your verification code is ${otp}`;
+    const fast2smsUrl = `https://www.fast2sms.com/dev/bulkV2?authorization=${apiKey}&route=q&message=${encodeURIComponent(message)}&flash=0&numbers=${cleanNumber}`;
 
     const response = await fetch(fast2smsUrl, {
       method: 'GET',
