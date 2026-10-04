@@ -25,6 +25,7 @@ import {
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
+  sendEmailVerification,
 } from 'firebase/auth';
 import { FormEvent, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -86,21 +87,42 @@ export default function SignupPage() {
         auth,
         rememberMe ? browserLocalPersistence : browserSessionPersistence
       );
+      
       const userCredential = await initiateEmailSignUp(auth, email, password);
 
       if (userCredential?.user) {
         await updateProfile(userCredential.user, { displayName: fullName });
-        // The onAuthStateChanged listener will handle the redirect to /onboarding
+        
+        // 1. Send Real Email Verification
+        await sendEmailVerification(userCredential.user);
+        
+        toast({
+          title: "Account Created!",
+          description: "A verification email has been sent to your inbox. Please verify before signing in.",
+        });
       }
     } catch (error: any) {
+      // 2. Custom User-Friendly Error Handler
+      let customMessage = "Sign-up failed. Please try again.";
+
+      if (error?.code === 'auth/email-already-in-use' || error?.message?.includes('email-already-in-use')) {
+        customMessage = "This email is already registered. Please log in or use a different email.";
+      } else if (error?.code === 'auth/weak-password') {
+        customMessage = "Password should be at least 6 characters long.";
+      } else if (error?.code === 'auth/invalid-email') {
+        customMessage = "Please enter a valid email address.";
+      } else if (error?.message) {
+        customMessage = error.message;
+      }
+
       toast({
         variant: 'destructive',
         title: 'Sign-up Failed',
-        description: error.message,
+        description: customMessage,
       });
     }
   };
-
+  
   if (isUserLoading || user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
